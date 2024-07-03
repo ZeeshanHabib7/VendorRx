@@ -1,0 +1,53 @@
+Issue Type: Task
+
+Summary: Create GET API to Fetch Products with Filters
+
+Description:
+We need a GET API using Laravel to fetch products with filters. The API should support these filters:
+
+Date range (startDate, endDate)
+Brand name (brand)
+Price range (minPrice, maxPrice)
+Keyword search (keyword)
+Requirements:
+
+Set up Laravel project:
+
+Create a new Laravel project.
+Create model and migration for products:
+
+Define product data with fields: id, name, price, date, and brand.
+Set up the controller and route:
+
+Create an endpoint to fetch products.
+Implement filtering:
+
+Date range filter with startDate and endDate query parameters.
+Brand name filter with brand query parameter.
+Price range filter with minPrice and maxPrice query parameters.
+Keyword search filter with keyword query parameter.
+Test the API:
+
+Test various combinations of query parameters to ensure filters work as expected.
+Acceptance Criteria:
+
+The API should return products based on the provided query parameters.
+The API endpoint should be /api/products.
+Filters should return relevant products.
+
+Sample Response:
+{
+  "success": true,
+  "status_code": 200,
+  "message": ["Data fetched successfully!"],
+  "data": {
+    "list": [
+      { 
+        "id": 1, "name": "Product 1",
+        "price": 100,
+        "date": "2024-06-01",
+        "brand": "BrandA"
+      }
+    ]
+  }
+}
