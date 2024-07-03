@@ -1,8 +1,0 @@
-diff a/app/Http/Controllers/Controller.php b/app/Http/Controllers/Controller.php	(rejected hunks)
-@@ -9,4 +9,6 @@
- class Controller extends BaseController
- {
-     use AuthorizesRequests, ValidatesRequests;
-+    //first
-+    //second
- }

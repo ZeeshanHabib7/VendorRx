@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\ProductRequest;
 use App\Models\Product;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index(ProductRequest $request)
     {
 
        return $products = Product::when($request->filled('startDate') && $request->filled('endDate'), function ($query) use ($request) {
@@ -24,6 +25,5 @@ class ProductController extends Controller
         })
         ->get();
 
-       
     }
 }
