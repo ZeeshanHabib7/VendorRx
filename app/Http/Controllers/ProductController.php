@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\ProductRequest;
 use App\Http\Helpers\ResponseHelper;
+use App\Http\Resources\ProductCollection;
 use App\Models\Product;
 
 class ProductController extends Controller
@@ -27,7 +28,7 @@ class ProductController extends Controller
             })
             ->get();
     
-            return ResponseHelper::success($products, 'Data fetched successfully!');
+            return ResponseHelper::success(new ProductCollection($products), 'Data fetched successfully!');
         }
         catch (Exception $e) {
             return ResponseHelper::error($e->getMessage(), $e->getCode());

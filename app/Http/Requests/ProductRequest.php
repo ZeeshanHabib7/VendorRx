@@ -25,8 +25,8 @@ class ProductRequest extends FormRequest
         return [
             'name' => 'string',
             'price' => 'integer|min:10',
-            'date' => 'date',
-            'brand' => 'string',
+            'date' => 'date|nullable',
+            'brand' => 'string|nullable',
         ];
     }
 
