@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\ProductsController_SA;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,4 +20,4 @@ use App\Http\Controllers\ProductsController;
 // });
 
 
-Route::get('/products', [ProductsController::class, 'getData']);
+Route::get('/products/', [ProductsController_SA::class, 'getData']);
