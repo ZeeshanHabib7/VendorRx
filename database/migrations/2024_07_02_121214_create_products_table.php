@@ -15,9 +15,10 @@ return new class extends Migration
             $table->increments('id');
             $table->string('name');
             $table->integer('price');
-            $table->date('date');
-            $table->string('brand');
+            $table->date('date')->nullable();
+            $table->string('brand')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
