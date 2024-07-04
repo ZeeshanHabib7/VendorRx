@@ -12,13 +12,10 @@ class Product extends Model
 
     protected $fillable = ['name', 'price', 'date', 'brand'];
 
-    public function getCreatedAtAttribute()
-    {
-        return Carbon::parse($this->attributes['created_at'])->format('Y-m-d H:i:s');
-    }
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:m:s',
+        'updated_at' => 'datetime:Y-m-d H:m:s',
+        'deleted_at' => 'datetime:Y-m-d H:m:s',
+        ];
 
-    public function getUpdatedAtAttribute()
-    {
-        return Carbon::parse($this->attributes['updated_at'])->format('Y-m-d H:i:s');
-    }
 }

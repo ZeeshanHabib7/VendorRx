@@ -25,7 +25,7 @@ class ProductRequest extends FormRequest
         return [
             'name' => 'string',
             'price' => 'integer|min:10',
-            'date' => 'date|after_or_equal:' . Carbon::today()->toDateString(),
+            'date' => 'date',
             'brand' => 'string',
         ];
     }
@@ -40,7 +40,6 @@ class ProductRequest extends FormRequest
             'price.min' => 'The price must be minimum of 10',
 
             'date.date' => 'The date field must be a valid date',
-            'date.after_or_equal' => 'The date must be today or later',
         ];
     }
 }
