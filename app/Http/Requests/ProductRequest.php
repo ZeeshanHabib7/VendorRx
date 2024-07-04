@@ -24,7 +24,7 @@ class ProductRequest extends FormRequest
     {
         return [
             'name' => 'string',
-            'price' => 'integer|min:10',
+            'price' => 'numeric|min:0|max:999999.99',
             'date' => 'date|nullable',
             'brand' => 'string|nullable',
         ];
