@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UserSearchRequest extends FormRequest
 {
@@ -21,7 +23,6 @@ class UserSearchRequest extends FormRequest
      */
     public function rules(): array
     {
-
         return [
             'search_value' => 'nullable|string|max:255',
             'search_by' => 'nullable|string|in:name,email',
@@ -29,6 +30,25 @@ class UserSearchRequest extends FormRequest
             'pagination' => 'sometimes|boolean',
             'page' => 'sometimes|integer|min:1',
             'type' => 'nullable|string|max:255',
+            'id' => 'nullable|integer|exists:users,id',
         ];
+    }
+
+    /**
+     * Handle a failed validation attempt.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @return void
+     *
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     */
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'status_code' => 422,
+            'message' => $validator->errors(),
+            'data'    => []
+        ], 422));
     }
 }
