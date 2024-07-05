@@ -20,7 +20,7 @@ class UserController extends Controller
 
             // Check if pagination is requested
             if (isset($input['pagination']) && !empty($input['pagination'])) {
-                $noOfRecordPerPage = $request->input('perPage', $this->noOfRecordPerPage); // Default to 15 records per page if not specified
+                $noOfRecordPerPage = $request->input('perPage', $this->noOfRecordPerPage); // Default to 10 records per page if not specified
                 $this->paginate = true;
 
                 // Perform pagination and format result as a resource collection
