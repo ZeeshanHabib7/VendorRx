@@ -21,22 +21,20 @@ class UserController extends Controller
             // Check if pagination is requested
             if (isset($input['pagination']) && !empty($input['pagination'])) {
                 $noOfRecordPerPage = $request->input('perPage', $this->noOfRecordPerPage); // Default to 15 records per page if not specified
-                $paginate = true;
+                $this->paginate = true;
 
                 // Perform pagination and format result as a resource collection
                 $result = UserResource::collection($users->paginate($noOfRecordPerPage));
             } elseif (isset($input['id']) && !empty($input['id'])) {
                 // Retrieve a specific user by ID and format result as a single resource
                 $result = UserResource::make($users->findOrFail($input['id']));
-                $paginate = $this->paginate;
             } else {
                 // Retrieve all users and format result as a resource collection
                 $result = UserResource::collection($users->get());
-                $paginate = $this->paginate;
             }
 
             // Return success response with the formatted result
-            return successResponse('Records Fetched Successfully.', $result,  $paginate);
+            return successResponse('Records Fetched Successfully.', $result,  $this->paginate);
         } catch (\Exception $e) {
             // Handle any exceptions that may occur during the process
             return handleException($e);
