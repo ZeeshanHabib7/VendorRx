@@ -28,6 +28,8 @@ class PaginationHelper
                 'pages' => $data->lastPage() > 1 ? range(1, $data->lastPage()) : [1],
                 'from' => $data->firstItem(),
                 'to' => $data->lastItem(),
+                'next_page_url' => $data->nextPageUrl(),
+                'previous_page_url' => $data->previousPageUrl()
             ];
 
             return $paginationArray;

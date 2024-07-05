@@ -75,7 +75,7 @@ class ProductsController_SA extends Controller
             $currentPage = $request->input('page', 1);
             $perPage = $request->input('pageSize', 5);
 
-            $filteredProducts = $query->paginate($perPage, ['*'], 'page', $currentPage);
+            $filteredProducts = $query->paginate($perPage, ['*'], 'page', $currentPage)->withQueryString();
 
             $myData = PaginationHelper::paginateMyData($filteredProducts, $currentPage, $perPage);
 
