@@ -15,7 +15,7 @@ class UserController extends Controller
     public function getAllUsers(UserSearchRequest $request)
     {
         try {
-            $input = $request->only('search_value', 'search_by', 'page', 'pagination', 'perPage', 'type');
+            $input = $request->only('search_value', 'search_by', 'page', 'pagination', 'perPage', 'type','id');
             $users = User::latest();
 
             // Check if pagination is requested
