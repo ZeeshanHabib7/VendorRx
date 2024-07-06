@@ -12,25 +12,14 @@ use App\Helpers\PaginationHelper;
 
 class ProductsController_SA extends Controller
 {
+
     public function getData(ProductRequest_SA $request)
     {
+
         if (!$request->query()) {
 
-            if ($request->paginate) {
+            return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", Products_SA::all(), $request->paginate, $request->pageSize, $request->pageNo));
 
-                $currentPage = $request->input('page', 1);
-                $perPage = $request->input('pageSize', 5);
-
-                $products = Products_SA::paginate($perPage, ['*'], 'page', $currentPage);
-
-                $myData = PaginationHelper::paginateMyData($products, $currentPage, $perPage);
-
-                // if no query but pagination true
-                return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", $myData));
-            }
-
-            // If no query and no pagination
-            return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", ProductResource_SA::collection(Products_SA::all())));
         }
 
         $query = Products_SA::query();
@@ -51,7 +40,6 @@ class ProductsController_SA extends Controller
             }
         }
 
-
         if ($request->has('minPrice')) {
             $query->where('price', '>=', $request->input('minPrice'));
         }
@@ -69,30 +57,23 @@ class ProductsController_SA extends Controller
         }
 
 
-        // Query parameters found and pagination also true
-        if ($request->paginate) {
+        if ($query->exists()) {
 
-            $currentPage = $request->input('page', 1);
-            $perPage = $request->input('pageSize', 5);
+            if ($request->paginate) {
+                echo "in paginate";
+                $myData = $query->paginate($request->pageSize, ['*'], 'page', $request->pageNo);
 
-            $filteredProducts = $query->paginate($perPage, ['*'], 'page', $currentPage)->withQueryString();
+                return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", $myData, $request->paginate, $request->pageSize, $request->pageNo));
+            }
 
-            $myData = PaginationHelper::paginateMyData($filteredProducts, $currentPage, $perPage);
+            $filteredProducts = $query->get();
 
-            return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", $myData));
+            return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", $filteredProducts));
         }
 
-        $filteredProducts = $query->get();
+        return response()->json(ResponseHelper::sendResponse(false, 404, "No Products Found :("));
 
-        if ($filteredProducts) {
 
-            return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", ProductResource_SA::collection($filteredProducts)));
-
-        } else {
-
-            return response()->json(ResponseHelper::sendResponse(false, 404, "No Products Found :("));
-
-        }
     }
 
 }
