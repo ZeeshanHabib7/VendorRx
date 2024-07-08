@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductsController_SA;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\LoginRegisterControllers;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,15 +17,16 @@ use App\Http\Controllers\UserController;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
 
 Route::get('/products/', [ProductsController_SA::class, 'getData']);
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
-Route::get('/users', [UserController::class, 'getAllUsers']);
+
+Route::get('/users/getUser', [UserController::class, 'getAllUsers']);
+
+echo "helllo world";
+
+
+Route::post('/register', [UserController::class, 'register']);
+Route::post('/login', [UserController::class, 'login']);
+
 
