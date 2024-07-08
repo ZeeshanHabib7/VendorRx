@@ -45,12 +45,10 @@ class UserController extends Controller
 
     public function register(UserRegisterRequest_SA $request)
     {
-        dd($request);
-        echo "hellllo from register";
         $user = User::create([
-            'name' => $request->input['name'],
-            'email' => $request->input['email'],
-            'password' => bcrypt($request->input['password'])
+            'name' =>$request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password)
 
         ]);
 
