@@ -26,6 +26,8 @@ class ProductRequest extends FormRequest
             'price' => 'numeric|min:0|max:999999.99',
             'date' => 'date|nullable',
             'brand' => 'string|nullable',
+            'pageNum' => 'sometimes|integer|min:1',
+            'pageSize' => 'sometimes|integer|min:1',
         ];
     }
 
