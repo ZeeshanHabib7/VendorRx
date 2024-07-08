@@ -112,3 +112,19 @@ if (!function_exists('handleException')) {
         return errorResponse('An unexpected error occurred.', $e->getCode());
     }
 }
+
+if (!function_exists('userSucessResponse')) {
+
+    function userResponse($message, $user = [], $sucess = true, $code = 200)
+    {
+
+        $response = [
+            'sucess' => $sucess,
+            'status_code' => $code,
+            'message' => [$message],
+            'user' => $user,
+        ];
+
+        return response()->json($response, $code);
+    }
+}
