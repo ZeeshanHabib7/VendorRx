@@ -23,10 +23,10 @@ Route::get('/products/', [ProductsController_SA::class, 'getData']);
 
 Route::get('/users/getUser', [UserController::class, 'getAllUsers']);
 
-echo "helllo world";
 
 
-Route::post('/register', [UserController::class, 'register']);
-Route::post('/login', [UserController::class, 'login']);
+
+Route::post('/users/register', [UserController::class, 'register']);
+Route::post('/users/login', [UserController::class, 'login']);
 
 
