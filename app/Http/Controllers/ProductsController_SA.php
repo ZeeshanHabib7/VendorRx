@@ -6,8 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Products_SA;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\ProductRequest_SA;
-use App\Http\Resources\ProductResource_SA;
-use App\Helpers\PaginationHelper;
+
 
 
 class ProductsController_SA extends Controller
@@ -18,60 +17,33 @@ class ProductsController_SA extends Controller
 
         if (!$request->query()) {
 
-            return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", Products_SA::all(), $request->paginate, $request->pageSize, $request->pageNo));
+            $data = Products_SA::all();
 
-        }
-
-        $query = Products_SA::query();
-
-        // Apply filters
-        if ($request->has('name')) {
-            $query->where('name', 'LIKE', '%' . $request->input('name') . '%');
-        }
-
-        if ($request->has('startDate') && $request->has('endDate')) {
-            $query->whereBetween('created_at', [$request->input('startDate'), $request->input('endDate')]);
         } else {
 
-            if ($request->has('startDate')) {
-                $query->where('created_at', '>=', $request->input('startDate'));
-            } elseif ($request->has('endDate')) {
-                $query->where('created_at', '<=', $request->input('endDate'));
-            }
-        }
+            $query = Products_SA::getFilteredProducts($request);
 
-        if ($request->has('minPrice')) {
-            $query->where('price', '>=', $request->input('minPrice'));
-        }
+            //if data is retrieved from query and pagination also true
+            if ($query->exists() && $request->paginate) {
 
-        if ($request->has('maxPrice')) {
-            $query->where('price', '<=', $request->input('maxPrice'));
-        }
+                $data = $query->paginate($request->pageSize, ['*'], 'page', $request->pageNo);
 
-        if ($request->has('brand')) {
-            $query->where('brand', $request->input('brand'));
-        }
+                // if only data is retrieved and no pagination
+            } else if ($query->exists()) {
 
-        if ($request->has('keyWord')) {
-            $query->where('brand', 'LIKE', '%' . $request->keyWord . '%')->orWhere('name', 'LIKE', '%' . $request->keyWord . '%');
-        }
+                $data = $query->get();
 
-
-        if ($query->exists()) {
-
-            if ($request->paginate) {
-                echo "in paginate";
-                $myData = $query->paginate($request->pageSize, ['*'], 'page', $request->pageNo);
-
-                return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", $myData, $request->paginate, $request->pageSize, $request->pageNo));
+            } else {
+                // sending error response means we didn't find data for given filters 
+                return response()->json(ResponseHelper::sendResponse(false, 404, "No Products Found :("));
             }
 
-            $filteredProducts = $query->get();
 
-            return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", $filteredProducts));
         }
 
-        return response()->json(ResponseHelper::sendResponse(false, 404, "No Products Found :("));
+        // sending sucess response
+        return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", $data, $request->paginate, $request->pageSize, $request->pageNo));
+
 
 
     }
