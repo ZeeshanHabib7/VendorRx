@@ -15,16 +15,14 @@ class LoginRegisterControllers extends Controller
 
     public function register(UserRegisterRequest_SA $request)
     {
-        dd($request);
-        echo "hellllo from register";
         $user = User::create([
-            'name' => $request->input['name'],
-            'email' => $request->input['email'],
-            'password' => bcrypt($request->input['password'])
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password)
 
         ]);
 
-        return userResponse("User Registered Sucessfully!", UserResource_SA::make($user));
+        return userResponse("User Registered Sucessfully!", $this->getToken(auth()->attempt($request->all())), UserResource_SA::make($user));
     }
 
     public function Login(UserLoginRequest_SA $request)
@@ -33,8 +31,8 @@ class LoginRegisterControllers extends Controller
         if (!$token = auth()->attempt($request->all())) {
             return userResponse("Unauthenticated User", false, 404);
         }
+        return userResponse("User Logged in Sucessfully!", $this->getToken($token), UserResource_SA::make(auth()->user()));
 
-        return $this->getToken($token);
     }
 
     protected function getToken($token)
