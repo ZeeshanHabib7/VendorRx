@@ -6,8 +6,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource_SA;
 use App\Http\Requests\UserSearchRequest;
-use App\Http\Requests\UserRegisterRequest_SA;
-use App\Http\Requests\UserLoginRequest_SA;
 
 class UserController extends Controller
 {
@@ -43,34 +41,4 @@ class UserController extends Controller
         }
     }
 
-    public function register(UserRegisterRequest_SA $request)
-    {
-        $user = User::create([
-            'name' =>$request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password)
-
-        ]);
-
-        return userResponse("User Registered Sucessfully!", UserResource_SA::make($user));
-    }
-
-    public function Login(UserLoginRequest_SA $request)
-    {
-
-        if (!$token = auth()->attempt($request->all())) {
-            return userResponse("Unauthenticated User", false, 404);
-        }
-
-        return $this->getToken($token);
-    }
-
-    protected function getToken($token)
-    {
-        return response()->json([
-            'acess_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
-        ]);
-    }
 }
