@@ -115,14 +115,18 @@ if (!function_exists('handleException')) {
 
 if (!function_exists('userSucessResponse')) {
 
-    function userResponse($message, $user = [], $sucess = true, $code = 200)
+    function userResponse($message, $token = [], $user = [], $sucess = true, $code = 200)
     {
 
         $response = [
             'sucess' => $sucess,
             'status_code' => $code,
             'message' => [$message],
-            'user' => $user,
+            'data' => [
+                'token' => $token,
+                'user' => $user,
+            ],
+
         ];
 
         return response()->json($response, $code);
