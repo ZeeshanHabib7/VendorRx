@@ -119,7 +119,7 @@ if (!function_exists('userSucessResponse')) {
     {
 
         $response = [
-            'sucess' => $sucess,
+            'success' => $sucess,
             'status_code' => $code,
             'message' => [$message],
             'data' => [
