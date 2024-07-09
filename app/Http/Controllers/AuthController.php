@@ -4,29 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Models\User;
+use App\Http\Resources\UserResource;
 
 class AuthController extends Controller
 {
-    public function signUp(UserRequest $request){
+    public function signUp(UserRequest $request) {
+        try {
+            // created model instance
+            $user = new User();
+            // calling create user function from model
+            $result = $user->createUser($request);
+            // Success response upon user signup
+            return successResponse(  "User Registered Sucessfully!",UserResource::make($result));
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-        ]);
+        }  catch (\Exception $e) {
+            // Handle any exceptions that may occur during the process
+            return handleException($e);
+        }
 
-        $token = auth('api')->login($user);
-        return $this->respondWithToken($token);
-
-    }
-
-    protected function respondWithToken($token)
-    {
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60
-        ]);
     }
 
  
