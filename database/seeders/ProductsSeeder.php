@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Products_SA;
+use App\Models\Products;
 use Faker\Factory as Faker;
 
 class ProductsSeeder extends Seeder
@@ -19,7 +19,7 @@ class ProductsSeeder extends Seeder
 
         for ($i = 1; $i < 50; $i++) {
 
-            $product = new Products_SA;
+            $product = new Products;
             $product->name = $faker->word;
             $product->price = $faker->randomFloat(2, 100, 2000);
             $product->brand = $faker->company;
