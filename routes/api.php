@@ -21,12 +21,12 @@ use App\Http\Controllers\LoginRegisterControllers;
 Route::get('/products/', [ProductsController_SA::class, 'getData']);
 
 
-Route::get('/users/getUser', [UserController::class, 'getAllUsers']);
+Route::get('/users', [UserController::class, 'getAllUsers']);
 
 
 
 
-Route::post('/users/register', [UserController::class, 'register']);
-Route::post('/users/login', [UserController::class, 'login']);
+Route::post('/users/register', [LoginRegisterControllers::class, 'register']);
+Route::post('/users/login', [LoginRegisterControllers::class, 'login']);
 
 
