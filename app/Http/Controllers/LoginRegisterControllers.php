@@ -15,12 +15,9 @@ class LoginRegisterControllers extends Controller
 
     public function register(UserRegisterRequest_SA $request)
     {
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password)
 
-        ]);
+        $user = User::createUser($request);
+
 
         return userResponse("User Registered Sucessfully!", $this->getToken(auth()->attempt($request->all())), UserResource_SA::make($user));
     }
@@ -28,7 +25,7 @@ class LoginRegisterControllers extends Controller
     public function Login(UserLoginRequest_SA $request)
     {
 
-        if (!$token = auth()->attempt($request->all())) {
+        if (!$token = auth()->attempt($request->only('email', 'password'))) {
             return userResponse("Unauthenticated User", false, 404);
         }
         return userResponse("User Logged in Sucessfully!", $this->getToken($token), UserResource_SA::make(auth()->user()));
@@ -38,9 +35,8 @@ class LoginRegisterControllers extends Controller
     protected function getToken($token)
     {
         return response()->json([
-            'acess_token' => $token,
+            'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
         ]);
     }
 }
