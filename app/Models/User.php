@@ -47,6 +47,30 @@ class User extends Authenticatable  implements JWTSubject
         'deleted_at' => 'datetime:Y-m-d H:m:s',
     ];
 
+   // user creation / signup
+    public function createUser($data){
+         $user = User::create([
+            'name' => $data->name,
+            'email' => $data->email,
+            'password' => $data->password,
+        ]);
+       $user->token = auth('api')->login($user);
+       return $user;
+
+    }
+
+    // mutator to encrypt password
+    public function setPasswordAttribute($value)
+    {
+       return $this->attributes['password'] = bcrypt($value);
+    }
+
+    // mutator to convert user name into lower case
+    public function setUserNameAttribute($value)
+    {
+        $this->attributes['name'] = strtolower($value);
+    }
+
     //jwt interface method implementation
 
     public function getJWTIdentifier()
