@@ -7,7 +7,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginRegisterControllers;
 use App\Http\Controllers\ProductController;
 
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -20,15 +19,20 @@ use App\Http\Controllers\ProductController;
 */
 
 
-Route::get('/products/', [ProductsController_SA::class, 'getData']);
 
 
-Route::get('/products', [ProductController::class, 'index']);
+// Route::get('/products', [ProductController::class, 'index'])->middleware('auth:api');
 
 
 
 
 Route::post('/users/register', [LoginRegisterControllers::class, 'register']);
 Route::post('/users/login', [LoginRegisterControllers::class, 'login']);
+
+Route::middleware('jwt.auth')->group(function () {
+    Route::get('/products', [ProductsController_SA::class, 'getData']);
+});
+
+
 
 
