@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Http\Requests\UserRequest;
+use App\Http\Requests\UserSignUpRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,7 +13,7 @@ class AuthControllerTest extends TestCase
     public function testSignUpWithValidData(): void
     {
         // Simulate a request with necessary parameters
-        $request = new UserRequest([
+        $request = new UserSignUpRequest([
             'name' => 'Test User',
             'email' => 'testuser@gmail.com',
             'password' => 'test1234',
@@ -33,7 +33,7 @@ class AuthControllerTest extends TestCase
     public function testSignUpWithInValidData(): void
     {
         // Simulate a request with necessary parameters
-        $request = new UserRequest([
+        $request = new UserSIgnUpRequest([
             'name' => ' ',
             'email' => 'testuser',
             'password' => 'test',
