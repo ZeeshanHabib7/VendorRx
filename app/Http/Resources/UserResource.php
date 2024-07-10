@@ -7,20 +7,24 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
+    // private $token;
+    // private $user;
+
+    // public function __construct($resource)
+    // {
+    //     $this->token = $resource['token'];
+    //     $this->user = $resource['user'];
+    // }
+
     public function toArray(Request $request): array
     {
         // Return reponse if token exists 
-        if(!empty($this->token)){
+        if(!empty($this->resource['token'])){
             return [
-                'token' => $this->token,
+                'token' => $this->resource['token'],
                 'user'=>[
-                    'name' => $this->name,
-                    'email' => $this->email
+                    'name' => $this->resource['user']['name'],
+                    'email' =>$this->resource['user']['email']
                 ]
             ];
         } 
