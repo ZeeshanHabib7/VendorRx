@@ -21,7 +21,8 @@ if (!function_exists('errorResponse')) {
             'success' => false,
             'status_code' => $statusCode,
             'message' => is_array($error) ? $error : [$error],
-            'data' => []
+            'error' => $errorMessages,
+            'data' => ['No data to acess']
         ];
 
         return response()->json($response, $statusCode);
