@@ -7,6 +7,8 @@ use App\Http\Requests\UserLoginRequest_SA;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Resources\UserResource_SA;
+use App\Http\Resources\UserResource;
+
 
 use Auth;
 
@@ -15,28 +17,41 @@ class LoginRegisterControllers extends Controller
 
     public function register(UserRegisterRequest_SA $request)
     {
+        $user = new User;
+        $user = $user->createUser($request);
+        $token = $this->getToken($request);
 
-        $user = User::createUser($request);
+        $data = [
+            'token' => $token,  // generrating a token for user data
+            'user' => $user,        // creating a new user
+        ];
+        // dd($data);
+        return successResponse("User Registered Sucessfully!", UserResource_SA::make($data));
 
-
-        return userResponse("User Registered Sucessfully!", $this->getToken(auth()->attempt($request->all())), UserResource_SA::make($user));
     }
 
-    public function Login(UserLoginRequest_SA $request)
+    public function login(UserLoginRequest_SA $request)
     {
 
-        if (!$token = auth()->attempt($request->only('email', 'password'))) {
-            return userResponse("Unauthenticated User", false, 404);
+        if (!$token = $this->getToken($request)) {
+            return errorResponse("Unauthenticated User", 401, );
         }
-        return userResponse("User Logged in Sucessfully!", $this->getToken($token), UserResource_SA::make(auth()->user()));
+
+        $data = [
+            'token' => $token,
+            'user' => auth()->user(),
+        ];
+
+
+        return successResponse("User Logged in Sucessfully!", UserResource_SA::make($data));
 
     }
 
-    protected function getToken($token)
+
+    protected function getToken(Request $request)
     {
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-        ]);
+
+        return Auth::guard('api')->attempt($request->only('email', 'password'));
     }
+
 }
