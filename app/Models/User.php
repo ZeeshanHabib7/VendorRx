@@ -54,7 +54,6 @@ class User extends Authenticatable  implements JWTSubject
             'email' => $data->email,
             'password' => $data->password,
         ]);
-       $user->token = auth('api')->login($user);
        return $user;
 
     }
