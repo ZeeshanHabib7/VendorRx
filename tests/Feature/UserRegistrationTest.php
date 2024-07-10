@@ -16,23 +16,24 @@ class UserRegistrationTest extends TestCase
      */
     public function testUserCanRegister()
     {
-        $response = $this->postJson('/api/users/register', [
-            'name' => 'Syed Samroze Ali',
-            'email' => 'samroze@gmail.com',
+        $response = $this->post('/api/users/register', [
+            'name' => 'Anas Ahmed',
+            'email' => 'anas@gmail.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
         ]);
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                'sucess',
+                'success',
                 'status_code',
                 'message',
                 'data' => [
                     'token' => [
-                        'acess_token',
-                        'bearer',
-                        'expires_in'
+                        'original' => [
+                            'access_token',
+                            'token_type',
+                        ],
                     ],
                     'user' => [
                         'id',
@@ -43,7 +44,8 @@ class UserRegistrationTest extends TestCase
             ]);
 
         $this->assertDatabaseHas('users', [
-            'email' => 'samroze@gmail.com',
+            'email' => 'anas@gmail.com',
+            'name' => 'Anas Ahmed'
         ]);
     }
 
@@ -55,12 +57,15 @@ class UserRegistrationTest extends TestCase
     public function testUserRegistrationFailsWithMissingFields()
     {
         $response = $this->postJson('/api/users/register', [
-            'name' => 'Samroze Ali',
+            'name' => 'Nasir Ali',
             // Missing email and password fields
         ]);
 
+        print_r($response);
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email', 'password']);
+            ->assertJsonValidationErrors(['message.email', 'message.password']);
+
+
     }
 
     /**
