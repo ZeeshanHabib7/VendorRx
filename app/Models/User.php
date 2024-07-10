@@ -66,7 +66,7 @@ class User extends Authenticatable  implements JWTSubject
     }
 
     // mutator to convert user name into lower case
-    public function setUserNameAttribute($value)
+    public function setNameAttribute($value)
     {
         $this->attributes['name'] = strtolower($value);
     }
