@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductsController_SA;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginRegisterControllers;
+use App\Http\Controllers\ProductController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +23,7 @@ use App\Http\Controllers\LoginRegisterControllers;
 Route::get('/products/', [ProductsController_SA::class, 'getData']);
 
 
-Route::get('/users', [UserController::class, 'getAllUsers']);
+Route::get('/products', [ProductController::class, 'index']);
 
 
 

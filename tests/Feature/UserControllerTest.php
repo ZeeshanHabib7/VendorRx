@@ -29,7 +29,7 @@ class UserControllerTest extends TestCase
         ]);
 
         // Call the controller method
-        $response = $this->get('/api/users', $request->all());
+        $response = $this->get('/user/all', $request->all());
         $response->assertStatus(200)
         ->assertJsonStructure([
             "success", "status_code", "message", "data"
@@ -52,7 +52,7 @@ class UserControllerTest extends TestCase
         ]);
 
         // Call the controller method
-        $response = $this->get('/api/users', $request->all());
+        $response = $this->get('/user/all', $request->all());
         // Assert response status and structure
         $response->assertStatus(200)
         ->assertJsonStructure([
