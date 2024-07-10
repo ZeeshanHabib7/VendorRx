@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 
 use App\Http\Requests\ProductRequest;
-use App\Http\Helpers\ResponseHelper;
 use App\Http\Resources\ProductCollection;
 use App\Models\Product;
 use Exception;
@@ -12,6 +11,8 @@ use Exception;
 class ProductController extends Controller
 {
     private $isPaginate = false;
+    private $defaultPageSize = 10;
+    private $defaultPageNum = 1;
 
     public function index(ProductRequest $request)
     {
@@ -19,11 +20,11 @@ class ProductController extends Controller
             $query_res = Product::when($request->filled('startDate') && $request->filled('endDate'), function ($query) use ($request) {
                 return $query->whereBetween('date', [$request->startDate, $request->endDate]);
             })
-            ->when($request->start_date, function ($query, $start_date) {
-                return $query->where('date', '>=', $start_date);
+            ->when($request->start_date, function ($query, $startDate) {
+                return $query->where('date', '>=', $startDate);
             })
-            ->when($request->end_date, function ($query, $end_date) {
-                return $query->where('date', '<=', $end_date);
+            ->when($request->end_date, function ($query, $endDate) {
+                return $query->where('date', '<=', $endDate);
             })
             ->when($request->filled('brand'), function ($query) use ($request) {
                 return $query->where('brand', $request->brand);
@@ -36,19 +37,19 @@ class ProductController extends Controller
             });        
             
             if($request->input('paginate') == 'true'){
-                $pageSize = $request->input('pageSize', 10);
-                $pageNum = $request->input('pageNum', 1);
+                $pageSize = $request->input('pageSize', $this->defaultPageSize);
+                $pageNum = $request->input('pageNum', $this->defaultPageNum);
                 $this->isPaginate = true;
-                $products = $query_res->paginate($pageSize, ['*'], 'page', $pageNum);
+                $products = $query_res->paginate($pageSize,$pageNum);
             } else{
                 $products = $query_res->get();
             }
 
-            return ResponseHelper::success(ProductCollection::collection($products) , 'Data fetched successfully!',200,$this->isPaginate);
+            return successResponse( 'Data fetched successfully!',ProductCollection::collection($products),$this->isPaginate, 200);
 
         }
         catch (Exception $e) {
-            return ResponseHelper::error($e->getMessage(), $e->getCode());
+            return handleException($e);
         }
       
     }
