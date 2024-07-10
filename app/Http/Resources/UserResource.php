@@ -14,6 +14,19 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        // Return reponse if token exists 
+        if(!empty($this->token)){
+            return [
+                'token' => $this->token,
+                'user'=>[
+                    'name' => $this->name,
+                    'email' => $this->email
+                ]
+            ];
+        } 
+        else {
+            return parent::toArray($request);
+        }
+         
     }
 }
