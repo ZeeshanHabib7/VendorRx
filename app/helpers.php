@@ -21,8 +21,7 @@ if (!function_exists('errorResponse')) {
             'success' => false,
             'status_code' => $statusCode,
             'message' => is_array($error) ? $error : [$error],
-            'error' => $errorMessages,
-            'data' => ['No data to acess']
+            'data' => null
         ];
 
         return response()->json($response, $statusCode);
@@ -114,22 +113,3 @@ if (!function_exists('handleException')) {
     }
 }
 
-if (!function_exists('userSucessResponse')) {
-
-    function userResponse($message, $token = [], $user = [], $sucess = true, $code = 200)
-    {
-
-        $response = [
-            'success' => $sucess,
-            'status_code' => $code,
-            'message' => [$message],
-            'data' => [
-                'token' => $token,
-                'user' => $user,
-            ],
-
-        ];
-
-        return response()->json($response, $code);
-    }
-}
