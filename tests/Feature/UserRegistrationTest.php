@@ -30,14 +30,8 @@ class UserRegistrationTest extends TestCase
                 'status_code',
                 'message',
                 'data' => [
-                    'token' => [
-                        'original' => [
-                            'access_token',
-                            'token_type',
-                        ],
-                    ],
+                    'token',
                     'user' => [
-                        'id',
                         'name',
                         'email',
                     ],
