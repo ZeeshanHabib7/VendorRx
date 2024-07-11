@@ -11,7 +11,7 @@ use App\Http\Controllers\ProductController;
 Route::post('login', [AuthController::class,'login']);
 Route::post('signup', [AuthController::class,'signUp']);
 
-Route::middleware(['auth:api'])->group(function () {
+Route::middleware(['check.auth'])->group(function () {
     Route::post('me', [AuthController::class,'me']); //user route
     Route::post('logout', [AuthController::class,'logout']);
     Route::post('refresh', [AuthController::class,'refresh']); //token refresh route
