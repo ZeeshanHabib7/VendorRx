@@ -18,14 +18,14 @@ class LoginRegisterControllers extends Controller
     public function register(UserRegisterRequest_SA $request)
     {
         $user = new User;
-        $user = $user->createUser($request);
-        $token = $this->getToken($request);
+        $user = $user->createUser($request);  // creating a new user
+        $token = $this->getToken($request);   // generrating a token for user data
 
         $data = [
-            'token' => $token,  // generrating a token for user data
-            'user' => $user,        // creating a new user
+            'token' => $token,
+            'user' => $user,
         ];
-        // dd($data);
+
         return successResponse("User Registered Sucessfully!", UserResource_SA::make($data));
 
     }
