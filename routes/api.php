@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductsController_SA;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginRegisterControllers;
 use App\Http\Controllers\ProductController;
+use App\Http\Middleware\ProductGuard;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,17 +22,16 @@ use App\Http\Controllers\ProductController;
 
 
 
-// Route::get('/products', [ProductController::class, 'index'])->middleware('auth:api');
-
+// Route::get('/products', [ProductController::class, 'index']);
 
 
 
 Route::post('/users/register', [LoginRegisterControllers::class, 'register']);
 Route::post('/users/login', [LoginRegisterControllers::class, 'login']);
 
-Route::middleware('jwt.auth')->group(function () {
-    Route::get('/products', [ProductsController_SA::class, 'getData']);
-});
+//PROTECTED Routes
+Route::get('/products', [ProductsController_SA::class, 'getData'])->middleware(ProductGuard::class);
+
 
 
 
