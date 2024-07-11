@@ -58,6 +58,14 @@ if (!function_exists('successResponse')) {
     }
 }
 
+if (!function_exists('getAuthenticatedUser')) {
+
+    function getAuthenticatedUser()
+    {
+       return auth('api')->user();
+    }
+}
+
 if (!function_exists('paginate')) {
     /**
      * paginate
