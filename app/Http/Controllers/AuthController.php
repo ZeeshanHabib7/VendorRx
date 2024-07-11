@@ -18,10 +18,7 @@ class AuthController extends Controller
             // generate token function call
             $token = $this->generateToken($user);
             // data to be passed in resource file
-            $data = [
-                'token' => $token,
-                'user' => $user
-            ];
+            $data = $this->generateAuthorisedUser($token, $user);
             // Success response upon user signup
             return successResponse(  "User Registered Sucessfully!",UserResource::make($data));
         }  catch (\Exception $e) {
@@ -40,24 +37,28 @@ class AuthController extends Controller
             // get email and password entered by user
             $credentials = $request->only('email', 'password');
             // authenticate user with given credentials
-            $token = auth('api')->attempt($credentials);
-            // check for unauthorized user with no token
-            if (!$token) {
-                return errorResponse("Unauthorized access - token is missing or invalid.",401);
-            } 
+            $token = $this->authenticateUser($credentials);
             // get authenticated user
-            $user = auth('api')->user();
+            $user = getAuthenticatedUser();
             // data to be passed in resource file
-            $data = [
-                'token' => $token,
-                'user' => $user
-            ];
+            $data = $this->generateAuthorisedUser($token, $user);
             // Success response upon user login
             return successResponse(  "User Logged-in Sucessfully!",UserResource::make($data));
         } catch (\Exception $e) {
             // Handle any exceptions that may occur during the process
             return handleException($e);
         }
+    }
+
+    public function authenticateUser($credentials){
+        return  auth('api')->attempt($credentials);
+    }
+
+    public function generateAuthorisedUser($token, $user) {
+        return  [
+            'token' => $token,
+            'user' => $user
+        ];
     }
 
     public function logout()
