@@ -30,7 +30,7 @@ Route::post('/users/register', [LoginRegisterControllers::class, 'register']);
 Route::post('/users/login', [LoginRegisterControllers::class, 'login']);
 
 //PROTECTED Routes
-Route::get('/products', [ProductsController_SA::class, 'getData'])->middleware(ProductGuard::class);
+Route::get('/products', [ProductsController_SA::class, 'getData'])->middleware('AuthGuard');
 
 
 
