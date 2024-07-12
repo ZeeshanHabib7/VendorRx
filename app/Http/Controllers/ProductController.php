@@ -17,32 +17,15 @@ class ProductController extends Controller
     public function index(ProductRequest $request)
     {
         try{
-            $query_res = Product::when($request->filled('startDate') && $request->filled('endDate'), function ($query) use ($request) {
-                return $query->whereBetween('date', [$request->startDate, $request->endDate]);
-            })
-            ->when($request->start_date, function ($query, $startDate) {
-                return $query->where('date', '>=', $startDate);
-            })
-            ->when($request->end_date, function ($query, $endDate) {
-                return $query->where('date', '<=', $endDate);
-            })
-            ->when($request->filled('brand'), function ($query) use ($request) {
-                return $query->where('brand', $request->brand);
-            })
-            ->when($request->filled('minPrice') && $request->filled('maxPrice'), function ($query) use ($request) {
-                return $query->whereBetween('price', [$request->minPrice, $request->maxPrice]);
-            })
-            ->when($request->filled('keyword'), function ($query) use ($request) {
-                return $query->where('name', 'like', '%' . $request->keyword . '%');
-            });        
+            $product = $this->filterProduct($request);     
             
-            if($request->input('paginate') == 'true'){
+            if ($request->input('paginate') == 'true'){
                 $pageSize = $request->input('pageSize', $this->defaultPageSize);
                 $pageNum = $request->input('pageNum', $this->defaultPageNum);
                 $this->isPaginate = true;
-                $products = $query_res->paginate($pageSize,$pageNum);
-            } else{
-                $products = $query_res->get();
+                $products = $product->paginate($pageSize,$pageNum);
+            } else {
+                $products = $product->get();
             }
 
             return successResponse( 'Data fetched successfully!',ProductCollection::collection($products),$this->isPaginate, 200);
@@ -50,8 +33,28 @@ class ProductController extends Controller
         }
         catch (Exception $e) {
             return handleException($e);
-        }
-      
+        }   
+    }
+
+    public function filterProduct($request) {
+       return Product::when($request->filled('startDate') && $request->filled('endDate'), function ($query) use ($request) {
+            return $query->whereBetween('date', [$request->startDate, $request->endDate]);
+        })
+        ->when($request->start_date, function ($query, $startDate) {
+            return $query->where('date', '>=', $startDate);
+        })
+        ->when($request->end_date, function ($query, $endDate) {
+            return $query->where('date', '<=', $endDate);
+        })
+        ->when($request->filled('brand'), function ($query) use ($request) {
+            return $query->where('brand', $request->brand);
+        })
+        ->when($request->filled('minPrice') && $request->filled('maxPrice'), function ($query) use ($request) {
+            return $query->whereBetween('price', [$request->minPrice, $request->maxPrice]);
+        })
+        ->when($request->filled('keyword'), function ($query) use ($request) {
+            return $query->where('name', 'like', '%' . $request->keyword . '%');
+        });   
     }
 
 
