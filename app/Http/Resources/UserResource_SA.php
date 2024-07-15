@@ -23,6 +23,8 @@ class UserResource_SA extends JsonResource
                 'user' => [
                     'name' => $data['user']->name,
                     'email' => $data['user']->email,
+                    'role' => $data['user']->roles->pluck('name'),
+                    'permissions' => $data['user']->permissions->pluck('name'),
                 ]
             ];
         } else {
