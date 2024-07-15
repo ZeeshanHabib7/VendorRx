@@ -11,6 +11,13 @@ class Products_SA extends Model
     use HasFactory;
     protected $table = "products";
     protected $primaryKey = "id";
+    protected $fillable = ['name', 'price', 'date', 'brand'];
+
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:m:s',
+        'updated_at' => 'datetime:Y-m-d H:m:s',
+        'deleted_at' => 'datetime:Y-m-d H:m:s',
+    ];
 
     static public function getFilteredProducts(ProductRequest_SA $request)
     {
