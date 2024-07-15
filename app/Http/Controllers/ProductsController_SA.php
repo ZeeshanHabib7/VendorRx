@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProductResource_SA;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\Products_SA;
 use App\Helpers\ResponseHelper;
@@ -44,8 +46,69 @@ class ProductsController_SA extends Controller
         // sending sucess response
         return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", $data, $request->paginate, $request->pageSize, $request->pageNo));
 
+    }
 
+    public function store(ProductRequest_SA $request)
+    {
+        try {
+            $products = Products_SA::create($request->all());
+            return successResponse("Product created successfully", ProductResource_SA::make($products));
 
+        } catch (\Exception $e) {
+
+            return errorResponse($e->getMessage());
+        }
+
+    }
+
+    public function show($productId)
+    {
+        try {
+            $product = $this->findProductById($productId);
+            return successResponse("Product found successfully", ProductResource_SA::make($product));
+
+        } catch (\Exception $e) {
+
+            return errorResponse($e->getMessage());
+        }
+    }
+
+    public function update(ProductRequest_SA $request, $productId)
+    {
+
+        try {
+            $product = $this->findProductById($productId);
+            $product->update([
+                'name' => $request->name,
+            ]);
+
+            return successResponse("Product updated successfully", ProductResource_SA::make($product));
+
+        } catch (\Exception $e) {
+
+            return errorResponse($e->getMessage());
+        }
+
+    }
+
+    public function destroy($productId)
+    {
+        try {
+            $product = $this->findProductById($productId);
+            $product->delete();
+
+            return successResponse("Product deleted successfully", ProductResource_SA::make($product));
+
+        } catch (\Exception $e) {
+
+            return errorResponse($e->getMessage());
+        }
+
+    }
+
+    protected function findProductById($productId)
+    {
+        return Product::find($productId);
     }
 
 }
