@@ -27,7 +27,7 @@ class ProductGuard
         } catch (JWTException $e) {
             // Handle token exceptions
 
-            return errorResponse("Unauthorized User. Token inavlid.", 401, [$e->getMessage()]);
+            return errorResponse("Unauthorized User. Token inavlid.", 401);
         }
 
 
