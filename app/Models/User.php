@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Models\Role;
@@ -81,9 +82,17 @@ class User extends Authenticatable implements JWTSubject
 
         ]);
 
+        $productView = Permission::findByName('product.view', 'api');
+        if(!$productView){
+            $productView = Permission::create(['name' => 'product.view']);
+        }
         $userRole = Role::where(['name' => 'user'])->first();
+        $userRole->givePermissionTo([
+            $productView,
+        ]);
         if ($userRole) {
             $user->assignRole($userRole);
+            $user->givePermissionTo([$productView]);
             return $user;
         }
     }
