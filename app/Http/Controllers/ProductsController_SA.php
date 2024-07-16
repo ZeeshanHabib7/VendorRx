@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource_SA;
 use App\Models\Product;
-use Illuminate\Http\Request;
 use App\Models\Products_SA;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\ProductRequest_SA;
@@ -65,7 +64,7 @@ class ProductsController_SA extends Controller
     {
         try {
             $product = $this->findProductById($productId);
-            return successResponse("Product found successfully", ProductResource_SA::make($product));
+            return successResponse("Product fetched successfully", ProductResource_SA::make($product));
 
         } catch (\Exception $e) {
 
@@ -80,6 +79,8 @@ class ProductsController_SA extends Controller
             $product = $this->findProductById($productId);
             $product->update([
                 'name' => $request->name,
+                'price'=> $request->price,
+                'brand'=> $request->brand,
             ]);
 
             return successResponse("Product updated successfully", ProductResource_SA::make($product));
@@ -102,6 +103,39 @@ class ProductsController_SA extends Controller
         } catch (\Exception $e) {
 
             return errorResponse($e->getMessage());
+        }
+
+    }
+
+    public function restore($productId)
+    {
+        try {
+            $product = Product::withTrashed()->find($productId);
+
+            if ($product && $product->trashed()) {
+                $product->restore();
+                return successResponse("Product restored successfully", ProductResource_SA::make($product));
+            }
+
+        } catch (\Exception $e) {
+            return errorResponse($e->getMessage(),404);
+        }
+       
+    }
+
+    public function permanentDelete($productId)
+    {
+        try {
+
+            $product = Product::withTrashed()->find($productId);
+
+            if ($product) {
+                $product->forceDelete();
+                return successResponse("Product permanently deleted successfully", ProductResource_SA::make($product));
+            }
+
+        } catch (\Exception $e) {
+            return errorResponse($e->getMessage(), 404);
         }
 
     }
