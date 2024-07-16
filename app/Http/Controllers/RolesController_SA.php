@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RolesRequest_SA;
 use App\Http\Resources\RolesResource_SA;
+use App\Interfaces\CRUD_Operations_Interface_SA;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 
 class RolesController_SA extends Controller
 {
-    public function store(Request $request)
+    public function store(RolesRequest_SA $request)
     {
         $request->validate([
             'name' => ['required', 'string', 'unique:roles,name'],
@@ -35,11 +37,8 @@ class RolesController_SA extends Controller
         }
     }
 
-    public function update(Request $request, $roleId)
+    public function update(RolesRequest_SA $request, $roleId)
     {
-        $request->validate([
-            'name' => 'required|string|unique:roles,name',
-        ]);
 
         try {
             $role = $this->findRolesById($roleId);
