@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Http\Requests\PermissionRequest_SA;
 use App\Http\Resources\PermissionResource_SA;
-use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 
 class PermissionController_SA extends Controller
 {
-    public function store(Request $request)
+    public function store(PermissionRequest_SA $request)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'unique:permissions,name'],
-        ]);
 
         $permission = Permission::create([
             'name' => $request->name,
@@ -26,7 +24,7 @@ class PermissionController_SA extends Controller
     {
         try {
             $permission = $this->findPermissionById($permissionId);
-            return successResponse("Permission found successfully", PermissionResource_SA::make($permission));
+            return successResponse("Permission fetched successfully", PermissionResource_SA::make($permission));
 
         } catch (\Exception $e) {
 
@@ -34,11 +32,8 @@ class PermissionController_SA extends Controller
         }
     }
 
-    public function update(Request $request, $permissionId)
+    public function update(PermissionRequest_SA $request, $permissionId)
     {
-        $request->validate([
-            'name' => 'required|string|unique:permissions,name',
-        ]);
 
         try {
             $permission = $this->findPermissionById($permissionId);
