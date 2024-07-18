@@ -3,17 +3,29 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Http\Requests\UserRegisterRequest_SA;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Spatie\Permission\Models\Role;
 
-class User extends Authenticatable  implements JWTSubject
+class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
     /**
      * The attributes that are mass assignable.
      *
@@ -49,7 +61,7 @@ class User extends Authenticatable  implements JWTSubject
     ];
 
    // user creation / signup
-    public function createUser($data){
+    public function createNewUser($data){
          $user = User::create([
             'name' => $data->name,
             'email' => $data->email,
@@ -62,7 +74,7 @@ class User extends Authenticatable  implements JWTSubject
     // mutator to encrypt password
     public function setPasswordAttribute($value)
     {
-       return $this->attributes['password'] = bcrypt($value);
+        return $this->attributes['password'] = bcrypt($value);
     }
 
     // mutator to convert user name into lower case
@@ -71,15 +83,27 @@ class User extends Authenticatable  implements JWTSubject
         $this->attributes['name'] = strtolower($value);
     }
 
-    //jwt interface method implementation
-
-    public function getJWTIdentifier()
+    public function createUser(UserRegisterRequest_SA $request)
     {
-        return $this->getKey();
-    }
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password,
 
-    public function getJWTCustomClaims()
-    {
-        return [];
+        ]);
+
+        $productView = Permission::findByName('product.view', 'api');
+        if(!$productView){
+            $productView = Permission::create(['name' => 'product.view']);
+        }
+        $userRole = Role::where(['name' => 'user'])->first();
+        $userRole->givePermissionTo([
+            $productView,
+        ]);
+        if ($userRole) {
+            $user->assignRole($userRole);
+            $user->givePermissionTo([$productView]);
+            return $user;
+        }
     }
 }

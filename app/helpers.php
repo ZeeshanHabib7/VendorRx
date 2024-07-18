@@ -24,7 +24,7 @@ if (!function_exists('errorResponse')) {
             'success' => false,
             'status_code' => $statusCode,
             'message' => is_array($error) ? $error : [$error],
-            'data' => []
+            'data' => null
         ];
 
         return response()->json($response, $statusCode);
@@ -135,3 +135,4 @@ if (!function_exists('handleException')) {
         return errorResponse('An unexpected error occurred.', $e->getCode());
     }
 }
+
