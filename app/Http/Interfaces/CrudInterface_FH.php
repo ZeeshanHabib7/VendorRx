@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Interfaces;
-use Illuminate\Http\Request;
 
 interface CrudInterface_FH
 {
@@ -9,11 +8,11 @@ interface CrudInterface_FH
     public function index();
 
     //to add a record
-    public function store(Request $request);
+    public function store(array $payload);
 
     //to update a record
-    public function update(Request $request, $id);
-
+    public function update(array $payload, $id);
+    
     //to delete a record
     public function destroy($id);
 }
