@@ -10,7 +10,6 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         // Return reponse if token exists 
-        
         if(!empty($this->resource['token'])){
             return [
                 'token' => $this->resource['token'],
@@ -20,8 +19,18 @@ class UserResource extends JsonResource
                 ]
             ];
         } 
-        else {
-            return parent::toArray($request);
+         else {
+            $user = [
+                'name' => $this->name,
+                'email' => $this->email,
+            ];
+
+            // Check if roles exist and include them in the response    
+           if ($this->roles->isNotEmpty()) {
+                 $user['roles'] = $this->roles->pluck('name');
+            }
+
+            return $user;
         }
          
     }
