@@ -1,0 +1,59 @@
+Title: Add Pagination in Product Fetch API
+Branch Name: feature/add_pagination_in_product_fetch_API
+
+Description:
+
+Implement pagination in the product fetch API using the provided pagination function. The data should be paginated only when the paginate key value is true. Additionally, take paginate, pageSize, and pageNo in request parameters.
+
+Tasks:
+
+Update API Endpoint:
+
+Modify the product fetch API endpoint to accept paginate, pageSize, and pageNo as request parameters.
+Ensure that the API only paginates the data when the paginate key value is true.
+Implement Pagination Logic:
+
+Use the provided paginate function to structure the pagination code.
+Integrate the pagination logic to handle the request parameters (paginate, pageSize, pageNo).
+Testing:
+
+Test the API with various scenarios to ensure pagination works correctly.
+Verify the response structure to match the expected pagination details.
+Pagination Function:
+
+<?
+public function paginate($data = [])
+{
+    $paginationArray = null;
+
+    if ($data != null) {
+        // Initialize pagination array with list of items
+        $paginationArray = [
+            'list' => $data->items(),
+            'pagination' => []
+        ];
+
+        // Add pagination details
+        $paginationArray['pagination'] = [
+            'total' => $data->total(),
+            'current' => $data->currentPage(),
+            'first' => 1,
+            'last' => $data->lastPage(),
+            'previous' => $data->currentPage() > 1 ? $data->currentPage() - 1 : 0,
+            'next' => $data->hasMorePages() ? $data->currentPage() + 1 : $data->lastPage(),
+            'pages' => $data->lastPage() > 1 ? range(1, $data->lastPage()) : [1],
+            'from' => $data->firstItem(),
+            'to' => $data->lastItem()
+        ];
+
+        return $this->result = $paginationArray;
+    }
+
+    return $paginationArray;
+}
+
+Acceptance Criteria:
+
+The product fetch API should correctly paginate the data when paginate is set to true.
+The API response should include the list of items and pagination details as structured by the paginate function.
+Pagination should respect the pageSize and pageNo parameters.
