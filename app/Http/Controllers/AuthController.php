@@ -14,7 +14,7 @@ class AuthController extends Controller
             // created model instance
             $user = new User();
             // calling create user function from model
-            $user = $user->createUser($request);
+            $user = $user->createNewUser($request);
             // generate token function call
             $token = $this->generateToken($user);
             // data to be passed in resource file
