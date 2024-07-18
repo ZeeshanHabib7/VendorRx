@@ -68,7 +68,7 @@ class UserController_FH extends Controller implements CrudInterface_FH {
             try {
                 $user = User::findOrFail($id);
                 $user->update($payload);
-                if ($payload.contains('role_ids')) {
+                if (array_key_exists("role_ids", $payload)) {
                     $roles = Role::whereIn('id', $payload['role_ids'])->get();
                     $user->syncRoles($roles);
                 }
