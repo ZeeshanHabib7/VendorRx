@@ -67,6 +67,12 @@ class User extends Authenticatable implements JWTSubject
             'email' => $data->email,
             'password' => $data->password,
         ]);
+
+        $role = Role::where('name', 'user')->first();
+        if ($role) {
+            $user->assignRole($role);
+        }
+        
        return $user;
 
     }
