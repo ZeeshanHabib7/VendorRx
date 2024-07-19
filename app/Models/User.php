@@ -60,6 +60,22 @@ class User extends Authenticatable implements JWTSubject
         'deleted_at' => 'datetime:Y-m-d H:m:s',
     ];
 
+   // user creation / signup
+    public function createNewUser($data){
+         $user = User::create([
+            'name' => $data->name,
+            'email' => $data->email,
+            'password' => $data->password,
+        ]);
+
+        $role = Role::where('name', 'user')->first();
+        if ($role) {
+            $user->assignRole($role);
+        }
+        
+       return $user;
+
+    }
 
     // mutator to encrypt password
     public function setPasswordAttribute($value)

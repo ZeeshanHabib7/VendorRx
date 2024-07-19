@@ -4,6 +4,9 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 if (!function_exists('errorResponse')) {
     /**
@@ -52,6 +55,14 @@ if (!function_exists('successResponse')) {
         ];
 
         return response()->json($response, $code);
+    }
+}
+
+if (!function_exists('getAuthenticatedUser')) {
+
+    function getAuthenticatedUser()
+    {
+       return auth('api')->user();
     }
 }
 
@@ -106,6 +117,18 @@ if (!function_exists('handleException')) {
 
         if ($e instanceof ModelNotFoundException) {
             return errorResponse('The requested data was not found.', 404);
+        }
+
+        if ($e instanceof TokenInvalidException) {
+            return errorResponse('Token is Invalid', 401);
+        } 
+        
+        if ($e instanceof TokenExpiredException) {
+            return errorResponse('Token is Expired', 401);
+        } 
+        
+        if($e instanceof JWTException) {
+            return errorResponse( 'Authorization Token not found', 401);
         }
 
         // For other exceptions, return a generic error response

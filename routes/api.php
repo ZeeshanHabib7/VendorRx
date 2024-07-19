@@ -4,8 +4,8 @@ use App\Http\Controllers\PermissionController_SA;
 use App\Http\Controllers\RolesController_SA;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProductsController_SA;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProductsController_SA;
 use App\Http\Controllers\LoginRegisterControllers;
 use App\Http\Controllers\ProductController;
 
@@ -50,6 +50,7 @@ Route::middleware(['AuthGuard', 'AdminCheck'])->group(function () {
     Route::apiResource('roles', RolesController_SA::class);
 });
 
+Route::get('all', [UserController::class, 'getAllUsers']);
 
 
 

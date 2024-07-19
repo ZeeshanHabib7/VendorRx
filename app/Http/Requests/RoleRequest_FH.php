@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ProductRequest extends FormRequest
+class RoleRequest_FH extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,27 +23,19 @@ class ProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'string',
-            'price' => 'numeric|min:0|max:999999.99',
-            'date' => 'date|nullable',
-            'brand' => 'string|nullable',
-            'pageNum' => 'sometimes|integer|min:1',
-            'pageSize' => 'sometimes|integer|min:1',
-        ];
-    }
+        // Rule for create method
+        if ($this->isMethod('post')) {
+            return ['name' => 'required|unique:role,name,'];
+        }
+         // Rule for update method
+        elseif ($this->isMethod('patch') || $this->isMethod('put')) {
+            $id = $this->route('role') ? $this->route('role')->id : null;
+            return [
+                'name' => 'required|unique:roles,name,' . $id,
+            ];
+        }
 
-    public function messages(){
-        return[
-            'name.string' => 'The name field must be a string',
-
-            'brand.string' => 'The brand field must be a string',
-
-            'price.integer' => 'The price field must be a integer',
-            'price.min' => 'The price must be minimum of 10',
-
-            'date.date' => 'The date field must be a valid date',
-        ];
+        return []; 
     }
 
     protected function failedValidation(Validator $validator)
