@@ -13,8 +13,10 @@ class AuthController extends Controller
         try {
             // created model instance
             $user = new User();
+            // Convert the request into an array
+            $payload = $request->all();
             // calling create user function from model
-            $user = $user->createNewUser($request);
+            $user = $user->createNewUser($payload);
             // generate token function call
             $token = $this->generateToken($user);
             // data to be passed in resource file
