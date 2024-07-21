@@ -64,28 +64,32 @@ class User extends Authenticatable implements JWTSubject
     ];
 
    // user creation / signup
-    public function createNewUser($data){
+    public function createNewUser($payload){
          // Create a customer in Stripe
          Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
 
          $stripeCustomer = Customer::create([
-             'name' => $data->name,
-             'email' => $data->email,
+             'name' => $payload['name'],
+             'email' => $payload['email'],
          ]);
       
+         // Store User in DB 
          $user = SELF::create([
-            'name' => $data->name,
-            'email' => $data->email,
-            'password' => $data->password,
+            'name' => $payload['name'],
+            'email' => $payload['email'],
+            'password' => $payload['password'],
             'stripe_customer_id' => $stripeCustomer->id
         ]);
 
-        $role = Role::where('name', 'user')->first();
-        if ($role) {
-            $user->assignRole($role);
-        }
+         // Assign role based on provided role ID or default to 'user' role
+         $roleId = $payload['role_ids'] ?? null;
+         $role = $roleId ? Role::find($roleId) : Role::where('name', 'user')->first();
+
+         if ($role) {
+            $user->syncRoles($role);
+         }
         
-       return $user;
+         return $user;
 
     }
 
