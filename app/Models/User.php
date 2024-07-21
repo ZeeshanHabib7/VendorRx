@@ -12,6 +12,8 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Models\Role;
+use Stripe\Stripe;
+use Stripe\Customer;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -35,6 +37,7 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'stripe_customer_id'
     ];
 
     /**
@@ -62,10 +65,19 @@ class User extends Authenticatable implements JWTSubject
 
    // user creation / signup
     public function createNewUser($data){
-         $user = User::create([
+         // Create a customer in Stripe
+         Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
+
+         $stripeCustomer = Customer::create([
+             'name' => $data->name,
+             'email' => $data->email,
+         ]);
+      
+         $user = SELF::create([
             'name' => $data->name,
             'email' => $data->email,
             'password' => $data->password,
+            'stripe_customer_id' => $stripeCustomer->id
         ]);
 
         $role = Role::where('name', 'user')->first();
