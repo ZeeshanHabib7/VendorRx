@@ -8,6 +8,9 @@ use App\Http\Resources\ProductCollection;
 use App\Http\Interfaces\CrudInterface_FH;
 use App\Models\Product;
 use Exception;
+use Stripe\Stripe;
+use Stripe\Product as StripeProduct;
+use Stripe\Price as StripePrice;
 
 class ProductController extends Controller implements CrudInterface_FH
 {
@@ -93,8 +96,28 @@ class ProductController extends Controller implements CrudInterface_FH
     public function store(array $payload)
     { 
         try {
+            // Stripe Key
+            Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
+
+            // Create Stripe Product
+            $stripeProduct = StripeProduct::create([
+                'name' => $payload['name']
+            ]);
+    
+            // Create Stripe Price
+            $stripePrice = StripePrice::create([
+                'unit_amount' => $payload['price'] * 100,
+                'currency' => 'usd',
+                'product' => $stripeProduct->id,
+            ]);
+    
+            // Save Stripe product id and price id 
+            $payload['stripe_product_id'] = $stripeProduct->id;
+            $payload['stripe_price_id'] = $stripePrice->id;
+            
             // create product
             $product = Product::create($payload);
+
             // success reponse upon creation
             return successResponse("Product Added Successfully!", ProductCollection::make($product));
         } 
@@ -113,7 +136,7 @@ class ProductController extends Controller implements CrudInterface_FH
 
     public function update(array $payload, $id)
     {
-        try{
+        try {
             $product = Product::findOrFail($id);
             // update product
             $product->update($payload);  
