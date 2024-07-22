@@ -1,8 +1,10 @@
 <?php
 
+
+use App\Http\Controllers\AddToCartController;
 use App\Http\Controllers\PermissionController_SA;
 use App\Http\Controllers\RolesController_SA;
-use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductsController_SA;
@@ -33,7 +35,8 @@ Route::post('/users/register', [LoginRegisterControllers::class, 'register']);
 Route::post('/users/login', [LoginRegisterControllers::class, 'login']);
 
 //PROTECTED Routes ---> For Authenticated Users Only
-Route::get('/products/getFilterData', [ProductsController_SA::class, 'getData'])->middleware('AuthGuard');
+Route::get('/products/get-filter-data', [ProductsController_SA::class, 'getData'])->middleware('AuthGuard');
+Route::post('/products/add-to-cart', [AddToCartController::class, 'store'])->middleware('AuthGuard');
 
 //PROTECTED Routes ---> For Admins Only
 Route::middleware(['AuthGuard', 'AdminCheck'])->group(function () {
@@ -43,12 +46,14 @@ Route::middleware(['AuthGuard', 'AdminCheck'])->group(function () {
     Route::put('/products/{id}', [ProductsController_SA::class, 'update'])->middleware('PermissionCheck:product.update');
     Route::delete('/products/{id}', [ProductsController_SA::class, ''])->middleware('PermissionCheck:product.delete');
     Route::post('/products/restore/{id}', [ProductsController_SA::class, 'restore'])->middleware('PermissionCheck:product.restore');
-    Route::delete('/products/permanent-delete/{id}', [ProductsController_SA::class, 'permanentDelete'])->middleware('PermissionCheck:product.permanentDelete'); 
+    Route::delete('/products/permanent-delete/{id}', [ProductsController_SA::class, 'permanentDelete'])->middleware('PermissionCheck:product.permanentDelete');
 
 
     Route::apiResource('permissions', PermissionController_SA::class);
     Route::apiResource('roles', RolesController_SA::class);
+
 });
+
 
 Route::get('all', [UserController::class, 'getAllUsers']);
 
