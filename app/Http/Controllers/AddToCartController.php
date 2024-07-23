@@ -8,14 +8,19 @@ use App\Models\Order_SA;
 use App\Models\OrderDetail_SA;
 use App\Models\Products_SA;
 use Carbon\Carbon;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Encryption\EncryptException;
+
 
 class AddToCartController extends Controller
 {
     public function store(AddToCartRequest_SA $request)
     {
         try {
+
             // Create a new order instance
             $order = new Order_SA;
             $order->reference_no = $this->generateReferenceNumber();
@@ -58,7 +63,7 @@ class AddToCartController extends Controller
                     $order->item++;
                 }
             }
-            echo $order->order_discount;
+
             $total = $order->total_price - $order->total_price * ($order->order_discount / 100);
 
             //Initializing the fileds for our Order table
@@ -68,8 +73,14 @@ class AddToCartController extends Controller
             $order->payment_status = 'paid';
             $order->save();
 
-            // dd($order->orderDetails);
-            return successResponse("Order added to cart successfully", Order_Resource_SA::make($order));
+            if ($request->header('isEncrypted') == true) {
+                $data = $this->encryptData(Order_Resource_SA::make($order)->toJson());
+            } else {
+                $data = Order_Resource_SA::make($order);
+            }
+
+
+            return successResponse("Order added to cart successfully", $data);
 
         } catch (\Exception $e) {
 
@@ -87,4 +98,40 @@ class AddToCartController extends Controller
 
         return $currentDate . 'DIP' . $currentTime;
     }
+
+    protected function encryptData($data)
+    {
+        return Crypt::encrypt($data);
+    }
+
+
+    // These two functions are for verifying the encrypted and decrypted data
+    public function encrypt(Request $request)
+    {
+        try {
+
+            $responseData = $request->getContent();
+            $encryptedResponse = Crypt::encrypt($responseData);
+            return successResponse("Encrypted Successfully", $encryptedResponse);
+        } catch (EncryptException $e) {
+            return errorResponse($e->getMessage());
+
+        }
+
+    }
+
+    public function decrypt(Request $request)
+    {
+        try {
+            $decryptedPayload = Crypt::decrypt($request->input('encryptedData'));
+            $decodedPayload = json_decode($decryptedPayload, true);
+            return successResponse("Decrypted Succesfully", $decodedPayload);
+
+        } catch (DecryptException $e) {
+            return errorResponse($e->getMessage());
+
+        }
+
+    }
 }
+
