@@ -22,11 +22,11 @@ class Order_Resource_SA extends JsonResource
             "order_details" => Order_Details_Resource_SA::collection($this->orderDetails),
             "address" => $this->address,
             "qty" => $this->total_quantity,
-            "price" => $this->total_price,
-            "order_discount_in_percent" => $this->order_discount,
-            "total_discount_in_percent" => $this->total_discount,
+            "price" => round($this->total_price, 2),
+            "order_discount_in_percent" => round($this->order_discount, 2),
+            "total_discount_in_percent" => round($this->total_discount, 2),
             "tax" => round($this->total_tax, 2),
-            "grand_total" => $this->grand_total,
+            "grand_total" => round($this->grand_total, 2),
 
         ];
     }
