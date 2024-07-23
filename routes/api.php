@@ -35,8 +35,10 @@ Route::post('/users/register', [LoginRegisterControllers::class, 'register']);
 Route::post('/users/login', [LoginRegisterControllers::class, 'login']);
 
 //PROTECTED Routes ---> For Authenticated Users Only
-Route::get('/products/get-filter-data', [ProductsController_SA::class, 'getData'])->middleware('AuthGuard');
-Route::post('/products/add-to-cart', [AddToCartController::class, 'store'])->middleware('AuthGuard');
+Route::middleware(['AuthGuard'])->group(function () {
+    Route::get('/products/get-filter-data', [ProductsController_SA::class, 'getData']);
+    Route::post('/products/add-to-cart', [AddToCartController::class, 'store'])->middleware('CheckEncryption');
+});
 
 //PROTECTED Routes ---> For Admins Only
 Route::middleware(['AuthGuard', 'AdminCheck'])->group(function () {
@@ -54,6 +56,10 @@ Route::middleware(['AuthGuard', 'AdminCheck'])->group(function () {
 
 });
 
+
+//Routes only made for checking the encrypted decrypted data
+Route::post('/encrypt', [AddToCartController::class, 'encrypt']);
+Route::post('/decrypt', [AddToCartController::class, 'decrypt']);
 
 Route::get('all', [UserController::class, 'getAllUsers']);
 
