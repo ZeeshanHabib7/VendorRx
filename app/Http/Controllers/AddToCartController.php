@@ -73,7 +73,7 @@ class AddToCartController extends Controller
             $order->payment_status = 'paid';
             $order->save();
 
-            if ($request->header('isEncrypted') == true) {
+            if ($request->header('isEncrypted') == "true") {
                 $data = $this->encryptData(Order_Resource_SA::make($order)->toJson());
             } else {
                 $data = Order_Resource_SA::make($order);
@@ -105,7 +105,7 @@ class AddToCartController extends Controller
     }
 
 
-    // These two functions are for verifying the encrypted and decrypted data
+    // These two functions are for verifying the encrypted and decrypted
     public function encrypt(Request $request)
     {
         try {
