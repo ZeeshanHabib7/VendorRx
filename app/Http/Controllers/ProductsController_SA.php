@@ -42,7 +42,7 @@ class ProductsController_SA extends Controller
         }
 
         // sending sucess response
-        return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", $data, $request->paginate, $request->pageSize, $request->pageNo));
+        return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", ProductResource::collection($data), $request->paginate, $request->pageSize, $request->pageNo));
 
     }
 
