@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Http\Requests\UserRegisterRequest_SA;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -60,9 +61,15 @@ class User extends Authenticatable implements JWTSubject
         'deleted_at' => 'datetime:Y-m-d H:m:s',
     ];
 
-   // user creation / signup
-    public function createNewUser($data){
-         $user = User::create([
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'user_id', 'user_id');
+    }
+
+    // user creation / signup
+    public function createNewUser($data)
+    {
+        $user = User::create([
             'name' => $data->name,
             'email' => $data->email,
             'password' => $data->password,
@@ -72,8 +79,8 @@ class User extends Authenticatable implements JWTSubject
         if ($role) {
             $user->assignRole($role);
         }
-        
-       return $user;
+
+        return $user;
 
     }
 
@@ -99,7 +106,7 @@ class User extends Authenticatable implements JWTSubject
         ]);
 
         $productView = Permission::findByName('product.view', 'api');
-        if(!$productView){
+        if (!$productView) {
             $productView = Permission::create(['name' => 'product.view']);
         }
         $userRole = Role::where(['name' => 'user'])->first();
