@@ -7,8 +7,6 @@ use App\Http\Requests\UserCrudRequest_FH;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
-use Stripe\Stripe;
-use Stripe\Customer;
 
 class UserController_FH extends Controller implements CrudInterface_FH {
 
