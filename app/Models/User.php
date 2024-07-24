@@ -37,7 +37,8 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
-        'stripe_customer_id'
+        'stripe_customer_id',
+        'stripe_payment_method_id'
     ];
 
     /**
