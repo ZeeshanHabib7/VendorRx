@@ -2,27 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ProductResource_SA;
-use App\Models\Product;
-use App\Models\Products_SA;
+use App\Http\Resources\ProductResource;
+use App\Models\Products;
 use App\Helpers\ResponseHelper;
-use App\Http\Requests\ProductRequest_SA;
+use App\Http\Requests\ProductRequest;
 
 
 
 class ProductsController_SA extends Controller
 {
 
-    public function getData(ProductRequest_SA $request)
+    public function getData(ProductRequest $request)
     {
 
         if (!$request->query()) {
 
-            $data = Products_SA::all();
+            $data = Products::all();
 
         } else {
 
-            $query = Products_SA::getFilteredProducts($request);
+            $query = Products::getFilteredProducts($request);
 
             //if data is retrieved from query and pagination also true
             if ($query->exists() && $request->paginate) {
@@ -47,11 +46,11 @@ class ProductsController_SA extends Controller
 
     }
 
-    public function store(ProductRequest_SA $request)
+    public function store(ProductRequest $request)
     {
         try {
-            $products = Products_SA::create($request->all());
-            return successResponse("Product created successfully", ProductResource_SA::make($products));
+            $products = Products::create($request->all());
+            return successResponse("Product created successfully", ProductResource::make($products));
 
         } catch (\Exception $e) {
 
@@ -64,7 +63,7 @@ class ProductsController_SA extends Controller
     {
         try {
             $product = $this->findProductById($productId);
-            return successResponse("Product fetched successfully", ProductResource_SA::make($product));
+            return successResponse("Product fetched successfully", ProductResource::make($product));
 
         } catch (\Exception $e) {
 
@@ -72,18 +71,18 @@ class ProductsController_SA extends Controller
         }
     }
 
-    public function update(ProductRequest_SA $request, $productId)
+    public function update(ProductRequest $request, $productId)
     {
 
         try {
             $product = $this->findProductById($productId);
             $product->update([
                 'name' => $request->name,
-                'price'=> $request->price,
-                'brand'=> $request->brand,
+                'price' => $request->price,
+                'brand' => $request->brand,
             ]);
 
-            return successResponse("Product updated successfully", ProductResource_SA::make($product));
+            return successResponse("Product updated successfully", ProductResource::make($product));
 
         } catch (\Exception $e) {
 
@@ -98,7 +97,7 @@ class ProductsController_SA extends Controller
             $product = $this->findProductById($productId);
             $product->delete();
 
-            return successResponse("Product deleted successfully", ProductResource_SA::make($product));
+            return successResponse("Product deleted successfully", ProductResource::make($product));
 
         } catch (\Exception $e) {
 
@@ -110,28 +109,28 @@ class ProductsController_SA extends Controller
     public function restore($productId)
     {
         try {
-            $product = Product::withTrashed()->find($productId);
+            $product = Products::withTrashed()->find($productId);
 
             if ($product && $product->trashed()) {
                 $product->restore();
-                return successResponse("Product restored successfully", ProductResource_SA::make($product));
+                return successResponse("Product restored successfully", ProductResource::make($product));
             }
 
         } catch (\Exception $e) {
-            return errorResponse($e->getMessage(),404);
+            return errorResponse($e->getMessage(), 404);
         }
-       
+
     }
 
     public function permanentDelete($productId)
     {
         try {
 
-            $product = Product::withTrashed()->find($productId);
+            $product = Products::withTrashed()->find($productId);
 
             if ($product) {
                 $product->forceDelete();
-                return successResponse("Product permanently deleted successfully", ProductResource_SA::make($product));
+                return successResponse("Product permanently deleted successfully", ProductResource::make($product));
             }
 
         } catch (\Exception $e) {
@@ -142,7 +141,7 @@ class ProductsController_SA extends Controller
 
     protected function findProductById($productId)
     {
-        return Product::find($productId);
+        return Products::find($productId);
     }
 
 }
