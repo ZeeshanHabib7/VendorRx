@@ -34,14 +34,20 @@ use App\Http\Controllers\ProductController;
 Route::post('/users/register', [LoginRegisterControllers::class, 'register']);
 Route::post('/users/login', [LoginRegisterControllers::class, 'login']);
 
-//PROTECTED Routes ---> For Authenticated Users Only
-Route::middleware(['AuthGuard'])->group(function () {
+//PROTECTED ROUTES
+
+// FOR Admins and Users both
+Route::middleware(['AuthGuard', 'RestrictTo:user,admin'])->group(function () {
     Route::get('/products/get-filter-data', [ProductsController_SA::class, 'getData']);
+});
+
+//FOR Users Only
+Route::middleware(['AuthGuard', 'RestrictTo:user'])->group(function () {
     Route::post('/products/add-to-cart', [AddToCartController::class, 'store'])->middleware('CheckEncryption');
 });
 
-//PROTECTED Routes ---> For Admins Only
-Route::middleware(['AuthGuard', 'AdminCheck'])->group(function () {
+//FOR Admins Only
+Route::middleware(['AuthGuard', 'RestrictTo:admin'])->group(function () {
 
     Route::post('/products', [ProductsController_SA::class, 'store'])->middleware('PermissionCheck:product.store');
     Route::get('/products/{id}', [ProductsController_SA::class, 'show'])->middleware('PermissionCheck:product.view');
