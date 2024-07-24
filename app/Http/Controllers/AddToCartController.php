@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AddToCartRequest_SA;
-use App\Http\Resources\Order_Resource_SA;
-use App\Models\Order_SA;
-use App\Models\OrderDetail_SA;
-use App\Models\Products_SA;
+use App\Http\Requests\AddToCartRequest;
+use App\Http\Resources\Order_Resource;
+use App\Models\Order;
+use App\Models\OrderDetail;
+use App\Models\Products;
 use Carbon\Carbon;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
@@ -17,12 +17,12 @@ use Illuminate\Contracts\Encryption\EncryptException;
 
 class AddToCartController extends Controller
 {
-    public function store(AddToCartRequest_SA $request)
+    public function store(AddToCartRequest $request)
     {
         try {
 
             // Create a new order instance
-            $order = new Order_SA;
+            $order = new Order;
             $order->reference_no = $this->generateReferenceNumber();
             $order->user_id = auth()->user()->id;
             $order->address = $request['billing_address'];
@@ -38,7 +38,7 @@ class AddToCartController extends Controller
                 $order->total_quantity += $product['quantity'];
 
                 //selecting only required data of the product
-                $retrievedProduct = Products_SA::select('id', 'name', 'price', 'discount', 'promotion')->find($product['product_id']);
+                $retrievedProduct = Products::select('id', 'name', 'price', 'discount', 'promotion')->find($product['product_id']);
 
                 // if any product has a promotion than order_discount not applicable
                 if ($retrievedProduct->promotion) {
@@ -48,7 +48,7 @@ class AddToCartController extends Controller
                 if ($retrievedProduct) {
 
                     //creating an Order_detail instance and initializing its fields
-                    $orderDetails = OrderDetail_SA::create([
+                    $orderDetails = OrderDetail::create([
                         "order_id" => $order->order_id,
                         "product_id" => $retrievedProduct->id,
                         "product_name" => $retrievedProduct->name,
@@ -74,9 +74,9 @@ class AddToCartController extends Controller
             $order->save();
 
             if ($request->header('isEncrypted') == "true") {
-                $data = $this->encryptData(Order_Resource_SA::make($order)->toJson());
+                $data = $this->encryptData(Order_Resource::make($order)->toJson());
             } else {
-                $data = Order_Resource_SA::make($order);
+                $data = Order_Resource::make($order);
             }
 
 
