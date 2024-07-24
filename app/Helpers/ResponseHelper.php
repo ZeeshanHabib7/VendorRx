@@ -4,7 +4,7 @@
 
 namespace App\Helpers;
 
-use App\Http\Resources\ProductResource_SA;
+use App\Http\Resources\ProductResource;
 
 class ResponseHelper
 {
@@ -16,7 +16,7 @@ class ResponseHelper
             'success' => $sucess,
             'status_code' => $code,
             'message' => [$msg],
-            'data' => ProductResource_SA::collection($products),
+            'data' => ProductResource::collection($products),
 
 
         ];
@@ -37,7 +37,7 @@ class ResponseHelper
             // Initialize pagination array with list of items
             //dd($data);
             $paginationArray = [
-                'list' => ProductResource_SA::collection($data->items()),
+                'list' => ProductResource::collection($data->items()),
                 'pagination' => []
             ];
 
