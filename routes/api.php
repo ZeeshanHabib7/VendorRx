@@ -2,6 +2,7 @@
 
 
 use App\Http\Controllers\AddToCartController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PermissionController_SA;
 use App\Http\Controllers\RolesController_SA;
 
@@ -44,6 +45,7 @@ Route::middleware(['AuthGuard', 'RestrictTo:user,admin'])->group(function () {
 //FOR Users Only
 Route::middleware(['AuthGuard', 'RestrictTo:user'])->group(function () {
     Route::post('/products/add-to-cart', [AddToCartController::class, 'store'])->middleware('CheckEncryption');
+    Route::get('/products/get-order-history', [OrderController::class, 'getOrderHistory']);
 });
 
 //FOR Admins Only
