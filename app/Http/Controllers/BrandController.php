@@ -1,5 +1,6 @@
 <?php
 // app/Http/Controllers/BrandController_HR.php
+// app/Http/Controllers/BrandController_HR.php
 
 namespace App\Http\Controllers;
 
@@ -16,10 +17,10 @@ class BrandController extends Controller
     public function index()
     {
         try {
-            $brands = Brand::all();
-            return ResponseHelper::success(BrandResource::collection($brands), 'Brands retrieved successfully.');
+            $brands = Brand::latest()->get();
+            return ResponseHelper::successResponse(BrandResource::collection($brands), 'Brands retrieved successfully.');
         } catch (Exception $e) {
-            return ResponseHelper::error([], 'Failed to retrieve brands.', 500);
+            return ResponseHelper::errorResponse([], 'Failed to retrieve brands.', 500);
         }
     }
 
@@ -27,9 +28,9 @@ class BrandController extends Controller
     {
         try {
             $brand = Brand::create($request->validated());
-            return ResponseHelper::success(new BrandResource($brand), 'Brand created successfully.', 201);
+            return ResponseHelper::successResponse(new BrandResource($brand), 'Brand created successfully.', 201);
         } catch (Exception $e) {
-            return ResponseHelper::error([], 'Failed to create brand.', 500);
+            return ResponseHelper::errorResponse([], 'Failed to create brand.', 500);
         }
     }
 
@@ -37,9 +38,9 @@ class BrandController extends Controller
     {
         try {
             $brand = Brand::findOrFail($id);
-            return ResponseHelper::success(new BrandResource($brand), 'Brand retrieved successfully.');
+            return ResponseHelper::successResponse(new BrandResource($brand), 'Brand retrieved successfully.');
         } catch (Exception $e) {
-            return ResponseHelper::error([], 'Brand not found.', 404);
+            return ResponseHelper::errorResponse([], 'Brand not found.', 404);
         }
     }
 
@@ -48,9 +49,9 @@ class BrandController extends Controller
         try {
             $brand = Brand::findOrFail($id);
             $brand->update($request->validated());
-            return ResponseHelper::success(new BrandResource($brand), 'Brand updated successfully.');
+            return ResponseHelper::successResponse(new BrandResource($brand), 'Brand updated successfully.');
         } catch (Exception $e) {
-            return ResponseHelper::error([], 'Failed to update brand.', 500);
+            return ResponseHelper::errorResponse([], 'Failed to update brand.', 500);
         }
     }
 
@@ -59,9 +60,9 @@ class BrandController extends Controller
         try {
             $brand = Brand::findOrFail($id);
             $brand->delete();
-            return ResponseHelper::success([], 'Brand deleted successfully.', 204);
+            return ResponseHelper::successResponse([], 'Brand deleted successfully.', 204);
         } catch (Exception $e) {
-            return ResponseHelper::error([], 'Failed to delete brand.', 500);
+            return ResponseHelper::errorResponse([], 'Failed to delete brand.', 500);
         }
     }
 }
