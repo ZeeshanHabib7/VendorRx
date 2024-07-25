@@ -7,8 +7,16 @@ use App\Http\Requests\UserCrudRequest_FH;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
+use App\Http\Interfaces\PaymentServiceInterface;
+class UserController_FH extends Controller implements CrudInterface_FH 
+{
+        protected $paymentService;
 
-class UserController_FH extends Controller implements CrudInterface_FH {
+        // Injected Service 
+        public function __construct(PaymentServiceInterface $paymentService)
+        {
+            $this->paymentService = $paymentService;
+        }
 
         //get users with the role assigned 
         public function index()
@@ -35,6 +43,13 @@ class UserController_FH extends Controller implements CrudInterface_FH {
           try {
                 // created model instance
                 $user = new User();
+                // Create Customer on stripe
+                $stripeCustomer = $this->paymentService->createCustomer([
+                    'name' => $payload['name'],
+                    'email' => $payload['email'],
+                ]);
+                // added stripe customer id in payload
+                $payload["stripe_customer_id"] = $stripeCustomer->id;
                 // calling create user function from model
                 $user = $user->createNewUser($payload);
 
