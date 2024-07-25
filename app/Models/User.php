@@ -12,8 +12,6 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Models\Role;
-use Stripe\Stripe;
-use Stripe\Customer;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -66,32 +64,22 @@ class User extends Authenticatable implements JWTSubject
 
    // user creation / signup
     public function createNewUser($payload){
-         // Create a customer in Stripe
-         Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
+        try {
+            // Store User in DB 
+            $user = SELF::create($payload);
 
-         $stripeCustomer = Customer::create([
-             'name' => $payload['name'],
-             'email' => $payload['email'],
-         ]);
-      
-         // Store User in DB 
-         $user = SELF::create([
-            'name' => $payload['name'],
-            'email' => $payload['email'],
-            'password' => $payload['password'],
-            'stripe_customer_id' => $stripeCustomer->id
-        ]);
+            // Assign role based on provided role ID or default to 'user' role
+            $roleId = $payload['role_ids'] ?? null;
+            $role = $roleId ? Role::find($roleId) : Role::where('name', 'user')->first();
 
-         // Assign role based on provided role ID or default to 'user' role
-         $roleId = $payload['role_ids'] ?? null;
-         $role = $roleId ? Role::find($roleId) : Role::where('name', 'user')->first();
-
-         if ($role) {
-            $user->syncRoles($role);
-         }
-        
-         return $user;
-
+            if ($role) {
+                $user->syncRoles($role);
+            }
+            
+            return $user;
+        } catch(\Exception $e){
+            return handleException($e);
+        }
     }
 
     // mutator to encrypt password
