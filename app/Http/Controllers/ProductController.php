@@ -9,14 +9,20 @@ use App\Http\Interfaces\CrudInterface_FH;
 use App\Models\Product;
 use Exception;
 use Stripe\Stripe;
-use Stripe\Product as StripeProduct;
-use Stripe\Price as StripePrice;
+use App\Http\Interfaces\PaymentServiceInterface;
 
 class ProductController extends Controller implements CrudInterface_FH
 {
     private $isPaginate = false;
     private $defaultPageSize = 10;
     private $defaultPageNum = 1;
+    protected $paymentService;
+
+    // Injected Service 
+    public function __construct(PaymentServiceInterface $paymentService)
+    {
+        $this->paymentService = $paymentService;
+    }
 
     // Fetch products
     public function getProducts(ProductRequest $request)
@@ -98,21 +104,12 @@ class ProductController extends Controller implements CrudInterface_FH
         try {
             // Stripe Key
             Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
-
-            // Create Stripe Product
-            $stripeProduct = StripeProduct::create([
-                'name' => $payload['name']
-            ]);
-    
-            // Create Stripe Price
-            $stripePrice = StripePrice::create([
-                'unit_amount' => $payload['price'] * 100,
-                'currency' => 'usd',
-                'product' => $stripeProduct->id,
-            ]);
-    
-            // Save Stripe product id and price id 
-            $payload['stripe_product_id'] = $stripeProduct->id;
+            // Create Product on stripe
+            $stripeProduct = $this->paymentService->createProduct($payload);
+            // added stripe product id in payload
+            $payload["stripe_product_id"] = $stripeProduct->id;
+            // Create Price on stripe
+            $stripePrice = $this->paymentService->createPrice($payload);
             $payload['stripe_price_id'] = $stripePrice->id;
             
             // create product
@@ -123,7 +120,8 @@ class ProductController extends Controller implements CrudInterface_FH
         } 
         catch (\Exception $e) {
             // Handle any exceptions that may occur during the process
-            return handleException($e);
+            // return handleException($e);
+            return $e;
         }
     }
 
