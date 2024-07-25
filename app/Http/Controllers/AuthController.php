@@ -6,15 +6,31 @@ use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserSignUpRequest;
 use App\Models\User;
 use App\Http\Resources\UserResource;
+use App\Http\Interfaces\PaymentServiceInterface;
 
 class AuthController extends Controller
 {
+    protected $paymentService;
+
+    // Injected Service 
+    public function __construct(PaymentServiceInterface $paymentService)
+    {
+        $this->paymentService = $paymentService;
+    }
+
     public function signUp(UserSignUpRequest $request) {
         try {
             // created model instance
             $user = new User();
             // Convert the request into an array
-            $payload = $request->all();
+            $payload = $request->validated();
+            // Create Customer on stripe
+            $stripeCustomer = $this->paymentService->createCustomer([
+                'name' => $payload['name'],
+                'email' => $payload['email'],
+            ]);
+            // added stripe customer id in payload
+            $payload["stripe_customer_id"] = $stripeCustomer->id;
             // calling create user function from model
             $user = $user->createNewUser($payload);
             // generate token function call
