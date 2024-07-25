@@ -10,7 +10,7 @@ use App\Models\Products_SA;
 use Carbon\Carbon;
 use App\Models\Payment;
 use App\Http\Interfaces\PaymentServiceInterface;
-use App\Enums\PaymentStatus;
+use Illuminate\Support\Facades\DB;
 
 class AddToCartController extends Controller
 {
@@ -25,6 +25,7 @@ class AddToCartController extends Controller
 
     public function store(AddToCartRequest_SA $request)
     {
+        DB::beginTransaction();
         try {
             
             // Get the authenticated user
@@ -36,9 +37,10 @@ class AddToCartController extends Controller
             // Create stripe card payment method of user
             $card = $this->storePaymentMethod($cardToken, $user);
 
-           
             //check if card is created
             if(!isset($card->id)) {
+                // Rollback transaction on error
+                DB::rollBack();
                 return errorResponse($card->getMessage(), $card->gethttpStatus());
             } 
                  
@@ -99,17 +101,27 @@ class AddToCartController extends Controller
             // Process Payment
             $payStatus = $this->processPayment($order->grand_total,$order->order_id, $user);
 
+            // Check if payStatus is succeed
+            if($payStatus != "succeeded"){
+                // Rollback transaction on error
+                DB::rollBack();
+                return errorResponse("Payment Failed! ". $payStatus,401);
+            }
+
             // save the payment status
             $order->payment_status = $payStatus;
 
             // save order in DB
             $order->save();
+
+            // Commit transaction
+            DB::commit();
             
             return successResponse("Order added to cart successfully", Order_Resource_SA::make($order));
             
         } catch (\Exception $e) {
-            //if there is an error in processing the order than that order and order_deatils associated with it must be deleted
-            $order->delete();
+            // Rollback transaction on error
+            DB::rollBack();
             return errorResponse($e->getMessage());
         }
 
@@ -126,11 +138,11 @@ class AddToCartController extends Controller
     public function storePaymentMethod($cardToken, $user)
     {
         try {
+            // generate card payload
+            $payload = $this->generateCardPayload($cardToken, $user);
+           
             // Create a card for the customer using the token
-            return $this->paymentService->createCard([
-                'customer_id' => $user->stripe_customer_id,
-                'token' => $cardToken
-            ]);
+            return $this->paymentService->createCard($payload);
 
         }
         catch (\Exception $e) {
@@ -147,21 +159,26 @@ class AddToCartController extends Controller
             // Create Stripe PaymentIntent
             $paymentIntent = $this->paymentService->createPaymentIntent($payload);
 
+           
             // Check the status of the payment intent
             if ($paymentIntent->status == 'succeeded') {
                 // Save payment details in DB
                 $this->addPaymentDetails($amount, $orderId, $paymentIntent);
-                return PaymentStatus::PAID;
             }
-            else {
-                // return PaymentStatus::UNPAID;
-                return errorResponse($paymentIntent->status,401);
-            }
-  
+
+            return $paymentIntent->status ;
+    
         }
         catch (\Exception $e) {
             return handleException($e);
         }
+    }
+
+    public function generateCardPayload($cardToken, $user){
+        return [
+            'customer_id' => $user->stripe_customer_id,
+            'token' => $cardToken
+        ];
     }
 
     public function generatePaymentPayload($amount, $user){
@@ -174,16 +191,18 @@ class AddToCartController extends Controller
 
     public function addPaymentDetails($amount, $orderId, $paymentIntent){
         try{
-            Payment::create([
+           $pay = Payment::create([
                 'order_id' => $orderId,
                 'payment_reference' => $paymentIntent->id,
                 'amount' => $amount,
                 'paying_method' => $paymentIntent['payment_method_types'][0],
                 'payment_note' => $paymentIntent->status,
+                'response' => json_encode($paymentIntent),
             ]);
         }
         catch (\Exception $e) {
             return handleException($e);
         }
     }
+
 }
