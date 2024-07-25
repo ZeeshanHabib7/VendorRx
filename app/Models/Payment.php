@@ -14,7 +14,15 @@ class Payment extends Model
         'payment_reference',
         'amount',
         'paying_method',
-        'payment_note'
+        'payment_note',
+        'response'
     ];
+
+
+      // relationship with the Order model
+      public function order()
+      {
+          return $this->belongsTo(Order_SA::class);
+      }
 
 }
