@@ -5,6 +5,8 @@ use Stripe\Stripe;
 use Stripe\Customer;
 use Stripe\PaymentIntent;
 use App\Http\Interfaces\PaymentServiceInterface;
+use Stripe\Product as StripeProduct;
+use Stripe\Price as StripePrice;
 
 class StripePaymentService implements PaymentServiceInterface
 {
@@ -36,6 +38,46 @@ class StripePaymentService implements PaymentServiceInterface
                 'payment_method' => $payload['card_id'],
                 'off_session' => true,
                 'confirm' => true,
+            ]);
+        } 
+        catch (\Exception $e) {
+            return handleException($e);
+        }
+    }
+
+    public function createCustomer(array $payload)
+    {
+        try {
+            return Customer::create([
+                'name' => $payload['name'],
+                'email' => $payload['email'],
+            ]);
+        } 
+        catch (\Exception $e) {
+            return handleException($e);
+        }
+    }
+
+    public function createProduct(array $payload)
+    {
+        try {
+              // Create Stripe Product
+            return StripeProduct::create([
+                'name' => $payload['name']
+            ]);
+        } 
+        catch (\Exception $e) {
+            return handleException($e);
+        }
+    }
+
+    public function createPrice(array $payload)
+    {
+        try {
+            return StripePrice::create([
+                'unit_amount' => $payload['price'] * 100,
+                'currency' => 'usd',
+                'product' => $payload['stripe_product_id'],
             ]);
         } 
         catch (\Exception $e) {
