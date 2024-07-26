@@ -19,7 +19,7 @@ class Order_SA extends Model
     }
 
     // relationship with the Payment model
-    public function payments()
+    public function payment()
     {
         return $this->hasOne(Payment::class);
     }
