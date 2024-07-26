@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use App\Models\Payment;
 use App\Http\Interfaces\PaymentServiceInterface;
 use Illuminate\Support\Facades\DB;
+use Exception;
 
 class AddToCartController extends Controller
 {
@@ -36,13 +37,6 @@ class AddToCartController extends Controller
 
             // Create stripe card payment method of user
             $card = $this->storePaymentMethod($cardToken, $user);
-
-            //check if card is created
-            if(!isset($card->id)) {
-                // Rollback transaction on error
-                DB::rollBack();
-                return errorResponse($card->getMessage(), $card->gethttpStatus());
-            } 
                  
             // Save the card id in the user table
             $user->stripe_card_id = $card->id;
@@ -105,7 +99,7 @@ class AddToCartController extends Controller
             if($payStatus != "succeeded"){
                 // Rollback transaction on error
                 DB::rollBack();
-                return errorResponse("Payment Failed! ". $payStatus,401);
+                return errorResponse("Payment Failed! ". $payStatus,402);
             }
 
             // save the payment status
@@ -122,7 +116,7 @@ class AddToCartController extends Controller
         } catch (\Exception $e) {
             // Rollback transaction on error
             DB::rollBack();
-            return errorResponse($e->getMessage());
+            return handleException($e);
         }
 
     }
@@ -146,7 +140,7 @@ class AddToCartController extends Controller
 
         }
         catch (\Exception $e) {
-            return handleException($e);
+            throw $e;
         }
     }
 
@@ -170,7 +164,7 @@ class AddToCartController extends Controller
     
         }
         catch (\Exception $e) {
-            return handleException($e);
+            throw $e;
         }
     }
 
@@ -191,7 +185,7 @@ class AddToCartController extends Controller
 
     public function addPaymentDetails($amount, $orderId, $paymentIntent){
         try{
-           $pay = Payment::create([
+           return Payment::create([
                 'order_id' => $orderId,
                 'payment_reference' => $paymentIntent->id,
                 'amount' => $amount,
