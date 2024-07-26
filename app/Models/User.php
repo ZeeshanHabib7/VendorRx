@@ -12,6 +12,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Models\Role;
+use Exception;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -63,23 +64,55 @@ class User extends Authenticatable implements JWTSubject
     ];
 
    // user creation / signup
-    public function createNewUser($payload){
+    public function createNewUser($payload, $paymentService){
         try {
+            // get role to be assigned
+            $role = $this->getRole($payload);
+            // create stripe customer if role is user
+            if($role->name == "user") {
+                $payload = $this->createStripeCustomer($payload, $paymentService);
+            } 
             // Store User in DB 
-            $user = SELF::create($payload);
-
-            // Assign role based on provided role ID or default to 'user' role
-            $roleId = $payload['role_ids'] ?? null;
-            $role = $roleId ? Role::find($roleId) : Role::where('name', 'user')->first();
-
+            $user = SELF::create($payload);          
+            // sync role
             if ($role) {
                 $user->syncRoles($role);
             }
-            
             return $user;
-        } catch(\Exception $e){
-            return handleException($e);
+        } catch(Exception $e) {
+            throw $e;
         }
+    }
+
+    // Assign role based on provided role ID or default to 'user' role
+    public function getRole($payload) {
+        $roleId = $payload['role_ids'] ?? null;
+        $role = $roleId ? Role::find($roleId) : Role::where('name', 'user');
+        return $role->first();
+    }
+
+    // Create Stripe Customer
+    public function createStripeCustomer($payload, $paymentService) {
+        try {
+            // generate payload for stripe service
+            $customerPayload = $this->generateStripeCustomerPayload($payload);
+            // Create Customer on stripe
+            $stripeCustomer = $paymentService->createCustomer($customerPayload);
+            // added stripe customer id in payload
+            $payload["stripe_customer_id"] = $stripeCustomer->id;
+            return $payload;
+        }  
+        catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    // generate payoad for stripe customer
+    public function generateStripeCustomerPayload($payload) {
+        return [
+            'name' => $payload['name'],
+            'email' => $payload['email'],
+        ];
     }
 
     // mutator to encrypt password
