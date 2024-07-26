@@ -7,6 +7,8 @@ use Stripe\PaymentIntent;
 use App\Http\Interfaces\PaymentServiceInterface;
 use Stripe\Product as StripeProduct;
 use Stripe\Price as StripePrice;
+use Exception;
+use Stripe\Exception\ApiErrorException;
 
 class StripePaymentService implements PaymentServiceInterface
 {
@@ -23,8 +25,8 @@ class StripePaymentService implements PaymentServiceInterface
                 ['source' => $payload['token']]
             );
         } 
-        catch (\Exception $e) {
-            return handleException($e);
+        catch (ApiErrorException $e) {
+            throw $e;
         }
     }
 
@@ -40,8 +42,8 @@ class StripePaymentService implements PaymentServiceInterface
                 'confirm' => true,
             ]);
         } 
-        catch (\Exception $e) {
-            return handleException($e);
+        catch (Exception $e) {
+            throw $e;
         }
     }
 
@@ -53,21 +55,36 @@ class StripePaymentService implements PaymentServiceInterface
                 'email' => $payload['email'],
             ]);
         } 
-        catch (\Exception $e) {
-            return handleException($e);
+        catch (Exception $e) {
+            throw $e;
         }
     }
 
     public function createProduct(array $payload)
     {
         try {
+            // array to be returned
+            $result = [];
               // Create Stripe Product
-            return StripeProduct::create([
+            $stripeProduct = StripeProduct::create([
                 'name' => $payload['name']
             ]);
+           
+            // chech if stripe product is created
+            if($stripeProduct){
+              // add stripe product id in result array
+              $result["stripe_product_id"] = $payload["stripe_product_id"] = $stripeProduct->id;
+              // create stripe price for the product created
+              $stripeProduct =  $this->createPrice($payload);
+              // add stripe price id in result array
+              $result['stripe_price_id'] = $stripeProduct->id;
+            }
+           
+            // return the result array
+            return $result;
         } 
-        catch (\Exception $e) {
-            return handleException($e);
+        catch (Exception $e) {
+            throw $e;
         }
     }
 
@@ -80,8 +97,8 @@ class StripePaymentService implements PaymentServiceInterface
                 'product' => $payload['stripe_product_id'],
             ]);
         } 
-        catch (\Exception $e) {
-            return handleException($e);
+        catch (Exception $e) {
+            throw $e;
         }
     }
 }
