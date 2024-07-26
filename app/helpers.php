@@ -132,8 +132,8 @@ if (!function_exists('handleException')) {
             return errorResponse( 'Authorization Token not found', 401);
         }
 
-        if($e instanceof ApiErrorException ){
-            return $e;
+        if($e instanceof ApiErrorException ) {
+            return errorResponse( $e->getMessage(), 402);
         }
 
         // For other exceptions, return a generic error response
