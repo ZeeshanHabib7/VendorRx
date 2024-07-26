@@ -8,7 +8,6 @@ use App\Http\Interfaces\PaymentServiceInterface;
 use Stripe\Product as StripeProduct;
 use Stripe\Price as StripePrice;
 use Exception;
-use Stripe\Exception\ApiErrorException;
 
 class StripePaymentService implements PaymentServiceInterface
 {
@@ -25,7 +24,7 @@ class StripePaymentService implements PaymentServiceInterface
                 ['source' => $payload['token']]
             );
         } 
-        catch (ApiErrorException $e) {
+        catch (Exception $e) {
             throw $e;
         }
     }
