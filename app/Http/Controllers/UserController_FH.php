@@ -17,7 +17,7 @@ class UserController_FH extends Controller implements CrudInterface_FH
         {
             $this->paymentService = $paymentService;
         }
-
+        
         //get users with the role assigned 
         public function index()
         {
@@ -41,17 +41,10 @@ class UserController_FH extends Controller implements CrudInterface_FH
         public function store(array $payload)
         {
           try {
-                // created model instance
-                $user = new User();
-                // Create Customer on stripe
-                $stripeCustomer = $this->paymentService->createCustomer([
-                    'name' => $payload['name'],
-                    'email' => $payload['email'],
-                ]);
-                // added stripe customer id in payload
-                $payload["stripe_customer_id"] = $stripeCustomer->id;
-                // calling create user function from model
-                $user = $user->createNewUser($payload);
+            // created model instance
+            $user = new User();
+            // calling create user function from model
+            $user = $user->createNewUser($payload, $this->paymentService);
 
             return successResponse('User created successfully', UserResource::make($user));
           }
