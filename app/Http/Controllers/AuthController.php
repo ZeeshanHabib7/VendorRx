@@ -24,15 +24,8 @@ class AuthController extends Controller
             $user = new User();
             // Convert the request into an array
             $payload = $request->validated();
-            // Create Customer on stripe
-            $stripeCustomer = $this->paymentService->createCustomer([
-                'name' => $payload['name'],
-                'email' => $payload['email'],
-            ]);
-            // added stripe customer id in payload
-            $payload["stripe_customer_id"] = $stripeCustomer->id;
             // calling create user function from model
-            $user = $user->createNewUser($payload);
+            $user = $user->createNewUser($payload, $this->paymentService);
             // generate token function call
             $token = $this->generateToken($user);
             // data to be passed in resource file
