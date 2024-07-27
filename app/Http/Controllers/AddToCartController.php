@@ -66,7 +66,7 @@ class AddToCartController extends Controller
 
             $total = $order->total_price - $order->total_price * ($order->order_discount / 100);
 
-            //Initializing the fileds for our Order table
+            //Initializing the fields for our Order table
             $order->total_tax = $order->total_price * 0.17;
             $order->grand_total = $total + $order->total_tax;
             $order->paid_ammount = $order->grand_total;
@@ -84,7 +84,7 @@ class AddToCartController extends Controller
 
         } catch (\Exception $e) {
 
-            //if there is an error in processing the order than that order and order_deatils associated with it must be deleted
+            //if there is an error in processing the order than that order and order_details associated with it must be deleted
             $order->delete();
             return errorResponse($e->getMessage());
         }
@@ -98,40 +98,7 @@ class AddToCartController extends Controller
 
         return $currentDate . 'DIP' . $currentTime;
     }
-
-    protected function encryptData($data)
-    {
-        return Crypt::encrypt($data);
-    }
-
-
     // These two functions are for verifying the encrypted and decrypted
-    public function encrypt(Request $request)
-    {
-        try {
 
-            $responseData = $request->getContent();
-            $encryptedResponse = Crypt::encrypt($responseData);
-            return successResponse("Encrypted Successfully", $encryptedResponse);
-        } catch (EncryptException $e) {
-            return errorResponse($e->getMessage());
-
-        }
-
-    }
-
-    public function decrypt(Request $request)
-    {
-        try {
-            $decryptedPayload = Crypt::decrypt($request->input('encryptedData'));
-            $decodedPayload = json_decode($decryptedPayload, true);
-            return successResponse("Decrypted Succesfully", $decodedPayload);
-
-        } catch (DecryptException $e) {
-            return errorResponse($e->getMessage());
-
-        }
-
-    }
 }
 
