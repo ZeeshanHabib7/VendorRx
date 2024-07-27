@@ -13,14 +13,12 @@ class RoleMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, $roles): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        // dd($roles);
-        $rolesArray = explode(',', str_replace(['[', ']', '"'], '', $roles));
 
-        foreach ($rolesArray as $role) {
+        foreach ($roles as $role) {
 
-            if ($request->user()->hasRole(trim($role))) {
+            if ($request->user()->hasRole($role)) {
                 return $next($request);
             }
         }
@@ -28,4 +26,5 @@ class RoleMiddleware
 
         return errorResponse("Access denied for unauthorized user", 403);
     }
+
 }
