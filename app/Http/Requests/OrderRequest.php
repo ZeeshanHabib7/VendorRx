@@ -25,8 +25,8 @@ class OrderRequest extends FormRequest
     {
         return [
             'orderById' => 'string|in:true,false',
-            'fromDate' => 'date',
-            'toDate' => 'date',
+            'fromDate' => 'date|date_format:Y-m-d',
+            'toDate' => 'date|date_format:Y-m-d',
             'payment_status' => 'string|in:paid,unpaid',
             'sale_status' => 'string|in:order_placed,order_rejected,order_completed,order_dispatched,order_returned',
             'pageSize' => 'numeric|nullable|min:1',
