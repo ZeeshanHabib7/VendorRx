@@ -31,39 +31,64 @@ class Order extends Model
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
-    protected function getFilterOrders(OrderRequest $request, $userId)
+    protected function getFilterOrders(OrderRequest $request, $userId = null)
     {
         try {
 
-            $query = Order::query()->where('user_id', $userId);
-
-            if ($request->has('orderById') && $request->input('orderById') == true) {
-                $query->orderBy('order_id', 'desc');
+            if ($request->user()->hasRole('admin') && $request->has('userId')) {
+                $userId = $request->userId;
             }
 
-            if ($request->has('fromDate')) {
-                $fromDate = Carbon::parse($request->input('fromDate'))->startOfDay();
-                $query->where('created_at', '>=', $fromDate);
+            $orders = $this->getOrders($userId);
+
+            // If we have date in parameters then we will get data between that data or else we will get data between our default dates
+            $orders = $orders->whereBetween('created_at', [$request->input('fromDate', '1990-01-01'), $request->input('toDate', date('Y-m-d H:i:s'))]);
+
+
+            if ($request->has('orderById') && $request->orderById == true) {
+                $orders = $orders->orderBy('order_id', 'asc');
             }
 
-            if ($request->has('toDate')) {
-                $toDate = Carbon::parse($request->input('toDate'))->endOfDay();
-                $query->where('created_at', '<=', $toDate);
-            }
+
+
+            // if ($request->has('fromDate')) {
+
+            //     $fromDate = Carbon::parse($request->input('fromDate'))->startOfDay();
+            //     $orders = $orders->where('created_at', '>=', $fromDate);
+            // }
+
+            // if ($request->has('toDate')) {
+            //     $toDate = Carbon::parse($request->input('toDate'))->endOfDay();
+            //     $orders = $orders->where('created_at', '<=', $toDate);
+            // }
 
             if ($request->has('saleStatus')) {
-                $query->where('sale_status', $request->input('saleStatus'));
+                $orders = $orders->where('sale_status', $request->input('saleStatus'));
             }
 
             if ($request->has('paymentStatus')) {
-                $query->where('payment_status', $request->input('paymentStatus'));
+                $orders = $orders->where('payment_status', $request->input('paymentStatus'));
             }
 
-            return $query;
+            return $orders;
 
         } catch (\Exception $e) {
 
             return errorResponse($e->getMessage(), 500);
         }
+    }
+
+    protected function getOrders($userId = null)
+    {
+
+        $orders = new Order;
+        if (!is_null($userId)) {
+            $orders = $orders->where('user_id', $userId);
+        }
+
+        $orders = $orders->orderBy('created_at', 'asc');
+
+        return $orders;
+
     }
 }
