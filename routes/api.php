@@ -6,6 +6,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PermissionController_SA;
 use App\Http\Controllers\RolesController_SA;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductsController_SA;
@@ -40,12 +41,13 @@ Route::post('/users/login', [LoginRegisterControllers::class, 'login']);
 // FOR Admins and Users both
 Route::middleware(['AuthGuard', 'RestrictTo:user,admin'])->group(function () {
     Route::get('/products/get-filter-data', [ProductsController_SA::class, 'getData']);
+    Route::get('/products/get-order-history', [OrderController::class, 'getOrderHistory']);
 });
 
 //FOR Users Only
-Route::middleware(['AuthGuard', 'RestrictTo:user'])->group(function () {
-    Route::post('/products/add-to-cart', [AddToCartController::class, 'store'])->middleware('CheckEncryption');
-    Route::get('/products/get-order-history', [OrderController::class, 'getOrderHistory']);
+Route::middleware(['AuthGuard', 'RestrictTo:user', 'CheckEncryption'])->group(function () {
+    Route::post('/products/add-to-cart', [AddToCartController::class, 'store']);
+
 });
 
 //FOR Admins Only
@@ -66,8 +68,13 @@ Route::middleware(['AuthGuard', 'RestrictTo:admin'])->group(function () {
 
 
 //Routes only made for checking the encrypted decrypted data
-Route::post('/encrypt', [AddToCartController::class, 'encrypt']);
-Route::post('/decrypt', [AddToCartController::class, 'decrypt']);
+Route::post('/encrypt', function (Request $request) {
+    return encrypt_payload($request);
+});
+Route::post('/decrypt', function (Request $request) {
+
+    return decrypt_payload($request);
+});
 
 Route::get('all', [UserController::class, 'getAllUsers']);
 
