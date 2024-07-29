@@ -6,7 +6,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductCollection;
 use App\Http\Interfaces\CrudInterface_FH;
-use App\Models\Products;
+use App\Models\Product;
 use Exception;
 use App\Http\Interfaces\PaymentServiceInterface;
 
@@ -58,7 +58,7 @@ class ProductController extends Controller implements CrudInterface_FH
     // Filtering products with respect to request params
     public function filterProduct($request)
     {
-        return Products::when($request->filled('startDate') && $request->filled('endDate'), function ($query) use ($request) {
+        return Product::when($request->filled('startDate') && $request->filled('endDate'), function ($query) use ($request) {
             return $query->whereBetween('date', [$request->startDate, $request->endDate]);
         })
             ->when($request->start_date, function ($query, $startDate) {
@@ -83,7 +83,7 @@ class ProductController extends Controller implements CrudInterface_FH
     {
         try {
             // get all products
-            return Products::all();
+            return Product::all();
         } catch (Exception $e) {
             // Handle any exceptions that may occur during the process
             return handleException($e);
@@ -109,7 +109,7 @@ class ProductController extends Controller implements CrudInterface_FH
                 $payload['stripe_price_id'] = $stripeProduct['stripe_price_id'];
             }
             // create product
-            $product = Products::create($payload);
+            $product = Product::create($payload);
 
             // success response upon creation
             return successResponse("Product Added Successfully!", ProductCollection::make($product));
@@ -129,11 +129,11 @@ class ProductController extends Controller implements CrudInterface_FH
     public function update(array $payload, $id)
     {
         try {
-            $product = Products::findOrFail($id);
+            $product = Product::findOrFail($id);
             // update product
             $product->update($payload);
             // get updated product
-            $updatedProduct = Products::find($product->id);
+            $updatedProduct = Product::find($product->id);
             // success response upon updating
             return successResponse("Product Updated Successfully!", ProductCollection::make($updatedProduct));
         } catch (Exception $e) {
@@ -147,7 +147,7 @@ class ProductController extends Controller implements CrudInterface_FH
     {
         try {
             // delete product
-            $product = Products::find($id);
+            $product = Product::find($id);
             $product->delete();
             // success response upon deletion
             return successResponse("Product Deleted Successfully!");
