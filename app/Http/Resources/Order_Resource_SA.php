@@ -17,7 +17,7 @@ class Order_Resource_SA extends JsonResource
 
         return [
             "user_id" => auth()->user()->id,
-            "order_no" => $this->reference_no,
+            "order_reference_no" => $this->reference_no,
             "items" => $this->item,
             "order_details" => Order_Details_Resource_SA::collection($this->orderDetails),
             "address" => $this->address,

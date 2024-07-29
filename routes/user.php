@@ -16,7 +16,7 @@ Route::post('signup', [AuthController::class,'signUp']);
 Route::middleware(['check.auth',])->group(function () {
     Route::post('me', [AuthController::class,'me']); //user route
     Route::post('logout', [AuthController::class,'logout']);
-    
+ 
                         // Routes only accessed by super admin
     Route::group(['middleware' => ['role:superAdmin']], function () {
 
@@ -33,9 +33,9 @@ Route::middleware(['check.auth',])->group(function () {
             Route::delete('/role/{id}', [RoleController_FH::class, 'destroy']);
 
         //-------- Users create, update, delete Route --------
-            Route::post('create', [UserController_FH::class, 'create']);
-            Route::put('edit/{id}', [UserController_FH::class, 'edit']);
-            Route::delete('delete/{id}', [UserController_FH::class, 'destroy']);
+            Route::post('/create', [UserController_FH::class, 'create']);
+            Route::put('/{id}', [UserController_FH::class, 'edit']);
+            Route::delete('/{id}', [UserController_FH::class, 'destroy']);
 
     });
 

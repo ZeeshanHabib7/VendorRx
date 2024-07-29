@@ -10,7 +10,7 @@ class Product extends Model
 {
     use HasFactory,SoftDeletes;
 
-    protected $fillable = ['name', 'price', 'date', 'brand'];
+    protected $fillable = ['name', 'price', 'date', 'brand', 'stripe_product_id', 'stripe_price_id'];
 
     protected $casts = [
         'created_at' => 'datetime:Y-m-d H:m:s',

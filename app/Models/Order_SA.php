@@ -17,4 +17,10 @@ class Order_SA extends Model
     {
         return $this->hasMany(OrderDetail_SA::class, 'order_id', 'order_id');
     }
+
+    // relationship with the Payment model
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
 }

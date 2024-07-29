@@ -29,7 +29,7 @@ class AddToCartRequest_SA extends FormRequest
             'products.*.product_id' => 'required|integer|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
             "billing_address" => "required|string",
-            "card_id" => "required|string",
+            "card_token" => "required|string",
             "order_discount" => "integer",
         ];
     }
@@ -69,5 +69,5 @@ class AddToCartRequest_SA extends FormRequest
 //     "billing_address_id": 18215,
 //     "use_billing_address_for_shipping": 1,
 //     "user_id": 142,
-//     "card_id": "card_1Oix9n2eZvKYlo2CAmnsF22d"
+//     "card_token": "tok_visa"
 // }
