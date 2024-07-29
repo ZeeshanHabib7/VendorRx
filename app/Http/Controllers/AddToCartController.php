@@ -8,7 +8,7 @@ use App\Http\Requests\AddToCartRequest;
 use App\Http\Resources\Order_Resource;
 use App\Models\Order;
 use App\Models\OrderDetail;
-use App\Models\Products;
+use App\Models\Product;
 use Carbon\Carbon;
 use App\Models\Payment;
 use App\Http\Interfaces\PaymentServiceInterface;
@@ -61,7 +61,7 @@ class AddToCartController extends Controller
                 $order->total_quantity += $product['quantity'];
 
                 //selecting only required data of the product
-                $retrievedProduct = Products::select('id', 'name', 'price', 'discount', 'promotion')->find($product['product_id']);
+                $retrievedProduct = Product::select('id', 'name', 'price', 'discount', 'promotion')->find($product['product_id']);
 
                 // if any product has a promotion than order_discount not applicable
                 if ($retrievedProduct->promotion) {
