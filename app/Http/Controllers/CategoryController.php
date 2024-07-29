@@ -18,9 +18,9 @@ class CategoryController extends Controller
     {
         try {
             $categories = Category::latest()->get();
-            return successResponse(CategoryResource::collection($categories), 'Categories retrieved successfully.');
+            return successResponse('Categories retrieved successfully.', CategoryResource::collection($categories));
         } catch (Exception $e) {
-            return errorResponse([], 'Failed to retrieve categories.', 500);
+            return errorResponse('Failed to retrieve categories.', 500);
         }
     }
 
@@ -28,9 +28,9 @@ class CategoryController extends Controller
     {
         try {
             $category = Category::create($request->validated());
-            return successResponse(new CategoryResource($category), 'Category created successfully.', 201);
+            return successResponse('Category created successfully.', new CategoryResource($category), 201);
         } catch (Exception $e) {
-            return errorResponse([], 'Failed to create category.', 500);
+            return errorResponse('Failed to create category.', 500);
         }
     }
 
@@ -38,9 +38,9 @@ class CategoryController extends Controller
     {
         try {
             $category = Category::findOrFail($id);
-            return successResponse(new CategoryResource($category), 'Category retrieved successfully.');
+            return successResponse("Category Fetched Successfully", new CategoryResource($category));
         } catch (Exception $e) {
-            return errorResponse([], 'Category not found.', 404);
+            return errorResponse('Category not found.', 404);
         }
     }
 
@@ -49,9 +49,9 @@ class CategoryController extends Controller
         try {
             $category = Category::findOrFail($id);
             $category->update($request->validated());
-            return successResponse(new CategoryResource($category), 'Category updated successfully.');
+            return successResponse('Category updated successfully.', new CategoryResource($category));
         } catch (Exception $e) {
-            return errorResponse([], 'Failed to update category.', 500);
+            return errorResponse('Failed to update category.', 500);
         }
     }
 
@@ -60,9 +60,9 @@ class CategoryController extends Controller
         try {
             $category = Category::findOrFail($id);
             $category->delete();
-            return successResponse([], 'Category deleted successfully.', 204);
+            return successResponse('Category deleted successfully.', 204);
         } catch (Exception $e) {
-            return errorResponse([], 'Failed to delete category.', 500);
+            return errorResponse('Failed to delete category.', 500);
         }
     }
 }
