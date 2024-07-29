@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource;
-use App\Models\Products;
+use App\Models\Product;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\ProductRequest;
 
@@ -17,11 +17,11 @@ class ProductsController_SA extends Controller
 
         if (!$request->query()) {
 
-            $data = Products::all();
+            $data = Product::all();
 
         } else {
 
-            $query = Products::getFilteredProducts($request);
+            $query = Product::getFilteredProducts($request);
 
             //if data is retrieved from query and pagination also true
             if ($query->exists() && $request->paginate) {
@@ -41,7 +41,7 @@ class ProductsController_SA extends Controller
 
         }
 
-        // sending sucess response
+        // sending success response
         return response()->json(ResponseHelper::sendResponse(true, 200, "Data Fetched Successfully", ProductResource::collection($data), $request->paginate, $request->pageSize, $request->pageNo));
 
     }
@@ -49,7 +49,7 @@ class ProductsController_SA extends Controller
     public function store(ProductRequest $request)
     {
         try {
-            $products = Products::create($request->all());
+            $products = Product::create($request->all());
             return successResponse("Product created successfully", ProductResource::make($products));
 
         } catch (\Exception $e) {
@@ -109,7 +109,7 @@ class ProductsController_SA extends Controller
     public function restore($productId)
     {
         try {
-            $product = Products::withTrashed()->find($productId);
+            $product = Product::withTrashed()->find($productId);
 
             if ($product && $product->trashed()) {
                 $product->restore();
@@ -126,7 +126,7 @@ class ProductsController_SA extends Controller
     {
         try {
 
-            $product = Products::withTrashed()->find($productId);
+            $product = Product::withTrashed()->find($productId);
 
             if ($product) {
                 $product->forceDelete();
@@ -141,7 +141,7 @@ class ProductsController_SA extends Controller
 
     protected function findProductById($productId)
     {
-        return Products::find($productId);
+        return Product::find($productId);
     }
 
 }
