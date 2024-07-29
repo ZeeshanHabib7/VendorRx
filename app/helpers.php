@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Stripe\Exception\ApiErrorException;
 
 if (!function_exists('errorResponse')) {
     /**
@@ -132,6 +133,10 @@ if (!function_exists('handleException')) {
 
         if ($e instanceof JWTException) {
             return errorResponse('Authorization Token not found', 401);
+        }
+
+        if($e instanceof ApiErrorException ) {
+            return errorResponse( $e->getMessage(), 402);
         }
 
         // For other exceptions, return a generic error response

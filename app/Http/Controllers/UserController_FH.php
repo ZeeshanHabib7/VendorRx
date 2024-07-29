@@ -7,9 +7,17 @@ use App\Http\Requests\UserCrudRequest_FH;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
+use App\Http\Interfaces\PaymentServiceInterface;
+class UserController_FH extends Controller implements CrudInterface_FH 
+{
+        protected $paymentService;
 
-class UserController_FH extends Controller implements CrudInterface_FH {
-
+        // Injected Service 
+        public function __construct(PaymentServiceInterface $paymentService)
+        {
+            $this->paymentService = $paymentService;
+        }
+        
         //get users with the role assigned 
         public function index()
         {
@@ -33,10 +41,11 @@ class UserController_FH extends Controller implements CrudInterface_FH {
         public function store(array $payload)
         {
           try {
-            $user = User::create($payload);
-            $roles = Role::whereIn('id', $payload['role_ids'])->get();
-            $user->syncRoles($roles);
-    
+            // created model instance
+            $user = new User();
+            // calling create user function from model
+            $user = $user->createNewUser($payload, $this->paymentService);
+
             return successResponse('User created successfully', UserResource::make($user));
           }
           catch (\Exception $e) {

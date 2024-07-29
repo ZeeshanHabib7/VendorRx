@@ -31,6 +31,12 @@ class Order extends Model
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
+    // relationship with the Payment model
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+
+    }
     protected function getFilterOrders(OrderRequest $request, $userId = null)
     {
         try {

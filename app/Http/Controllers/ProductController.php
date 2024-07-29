@@ -8,12 +8,20 @@ use App\Http\Resources\ProductCollection;
 use App\Http\Interfaces\CrudInterface_FH;
 use App\Models\Products;
 use Exception;
+use App\Http\Interfaces\PaymentServiceInterface;
 
 class ProductController extends Controller implements CrudInterface_FH
 {
     private $isPaginate = false;
     private $defaultPageSize = 10;
     private $defaultPageNum = 1;
+    protected $paymentService;
+
+    // Injected Service 
+    public function __construct(PaymentServiceInterface $paymentService)
+    {
+        $this->paymentService = $paymentService;
+    }
 
     // Fetch products
     public function getProducts(ProductRequest $request)
@@ -92,9 +100,18 @@ class ProductController extends Controller implements CrudInterface_FH
     public function store(array $payload)
     {
         try {
+            // Create Product on stripe
+            $stripeProduct = $this->paymentService->createProduct($payload);
+            if ($stripeProduct['stripe_product_id'] && $stripeProduct['stripe_price_id']) {
+                // Create prod on stripe
+                $payload['stripe_product_id'] = $stripeProduct['stripe_product_id'];
+                // Create Price on stripe
+                $payload['stripe_price_id'] = $stripeProduct['stripe_price_id'];
+            }
             // create product
             $product = Products::create($payload);
-            // success reponse upon creation
+
+            // success response upon creation
             return successResponse("Product Added Successfully!", ProductCollection::make($product));
         } catch (Exception $e) {
             // Handle any exceptions that may occur during the process
@@ -116,9 +133,9 @@ class ProductController extends Controller implements CrudInterface_FH
             // update product
             $product->update($payload);
             // get updated product
-            $updatedproduct = Products::find($product->id);
-            // success response upon updation
-            return successResponse("Product Updated Successfully!", ProductCollection::make($updatedproduct));
+            $updatedProduct = Products::find($product->id);
+            // success response upon updating
+            return successResponse("Product Updated Successfully!", ProductCollection::make($updatedProduct));
         } catch (Exception $e) {
             // Handle any exceptions that may occur during the process
             return handleException($e);

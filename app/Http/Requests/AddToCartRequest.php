@@ -29,7 +29,7 @@ class AddToCartRequest extends FormRequest
             'products.*.product_id' => 'required|integer|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
             "billing_address" => "required|string",
-            "card_id" => "required|string",
+            "card_token" => "required|string",
             "order_discount" => "integer",
         ];
     }
@@ -39,7 +39,7 @@ class AddToCartRequest extends FormRequest
         return [
             "products.require" => "Products are required",
             "products.array" => "Products must be in array",
-            "products.*.product_id.exists" => "Product doesnot exist in database",
+            "products.*.product_id.exists" => "Product does not exist in database",
             "products.*.quantity" => "Product quantity required"
         ];
     }
