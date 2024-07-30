@@ -32,6 +32,8 @@ class Product extends Model
         'product_details',
         'is_active',
         'discount',
+        'stripe_product_id',
+        'stripe_price_id'
     ];
 
     protected $casts = [
