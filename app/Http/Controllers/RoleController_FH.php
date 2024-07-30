@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Interfaces\CrudInterface_FH;
 use App\Http\Requests\RoleRequest_FH;
-use App\Http\Resources\RolePermissionResource_FH;
+use App\Http\Resources\RolePermissionResource;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -17,15 +17,15 @@ class RoleController_FH extends Controller implements CrudInterface_FH
             // get all roles
             $roles = Role::all();
             // success response upon roles fetched
-            return successResponse("Roles Fetched Successfully!", RolePermissionResource_FH::collection($roles));
-        } 
-        catch (\Exception $e) {
+            return successResponse("Roles Fetched Successfully!", RolePermissionResource::collection($roles));
+        } catch (\Exception $e) {
             // Handle any exceptions that may occur during the process
             return handleException($e);
         }
     }
 
-    public function create(RoleRequest_FH $request){
+    public function create(RoleRequest_FH $request)
+    {
         $validatedData = $request->validated();
         return $this->store($validatedData);
     }
@@ -36,9 +36,8 @@ class RoleController_FH extends Controller implements CrudInterface_FH
             // create role
             $role = Role::create($payload);
             // success reponse upon creation
-            return successResponse("Role Created Successfully!", RolePermissionResource_FH::make($role));
-        } 
-        catch (\Exception $e) {
+            return successResponse("Role Created Successfully!", RolePermissionResource::make($role));
+        } catch (\Exception $e) {
             // Handle any exceptions that may occur during the process
             return handleException($e);
         }
@@ -47,24 +46,23 @@ class RoleController_FH extends Controller implements CrudInterface_FH
     public function edit(RoleRequest_FH $request, $id)
     {
         $validatedData = $request->validated();
-        return $this->update($validatedData,$id);
+        return $this->update($validatedData, $id);
     }
 
     public function update(array $payload, $roleId)
     {
-        try{
+        try {
             $role = Role::findOrFail($roleId);
             // update role
-            $role->update($payload);  
+            $role->update($payload);
             // get updated role
-            $updatedRole = Role::find($role->id);  
+            $updatedRole = Role::find($role->id);
             // success response upon updation
-            return successResponse("Role Updated Successfully!",RolePermissionResource_FH::make($updatedRole));
-        } 
-        catch (\Exception $e) {
+            return successResponse("Role Updated Successfully!", RolePermissionResource::make($updatedRole));
+        } catch (\Exception $e) {
             // Handle any exceptions that may occur during the process
             return handleException($e);
-        }  
+        }
     }
 
     public function destroy($roleId)
@@ -81,29 +79,28 @@ class RoleController_FH extends Controller implements CrudInterface_FH
         }
     }
 
-       // Add or sync permissions to a role
-       public function updatePermissions(Request $request, $roleId)
-       {
-            try{
-                $role = Role::findOrFail($roleId);
-                
-                $permissions = $request->input('permission_ids');
-                if (is_array($permissions)) {
-                    $permissions = Permission::whereIn('id', $permissions)->get();
-                    $role->syncPermissions($permissions);
-                    $message = 'Permissions synchronized with role successfully';
-                } else {
-                    $permission = Permission::findOrFail($permissions);
-                    $role->givePermissionTo($permission);
-                    $message = 'Permission given to role successfully';
-                }
-        
-                return successResponse( $message);
-            }
-            catch (\Exception $e) {
-                // Handle any exceptions that may occur during the process
-                return handleException($e);
+    // Add or sync permissions to a role
+    public function updatePermissions(Request $request, $roleId)
+    {
+        try {
+            $role = Role::findOrFail($roleId);
+
+            $permissions = $request->input('permission_ids');
+            if (is_array($permissions)) {
+                $permissions = Permission::whereIn('id', $permissions)->get();
+                $role->syncPermissions($permissions);
+                $message = 'Permissions synchronized with role successfully';
+            } else {
+                $permission = Permission::findOrFail($permissions);
+                $role->givePermissionTo($permission);
+                $message = 'Permission given to role successfully';
             }
 
-       }
+            return successResponse($message);
+        } catch (\Exception $e) {
+            // Handle any exceptions that may occur during the process
+            return handleException($e);
+        }
+
+    }
 }

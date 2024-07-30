@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class AddToCartRequest_SA extends FormRequest
+class AddToCartRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -39,7 +39,7 @@ class AddToCartRequest_SA extends FormRequest
         return [
             "products.require" => "Products are required",
             "products.array" => "Products must be in array",
-            "products.*.product_id.exists" => "Product doesnot exist in database",
+            "products.*.product_id.exists" => "Product does not exist in database",
             "products.*.quantity" => "Product quantity required"
         ];
     }
@@ -54,20 +54,3 @@ class AddToCartRequest_SA extends FormRequest
         ], 422));
     }
 }
-
-// {
-//     "products": [
-//         {
-//             "product_id": 5,
-//             "quantity": 1
-//         },
-//         {
-//             "product_id": 7,
-//             "quantity": 1
-//         }
-//     ],
-//     "billing_address_id": 18215,
-//     "use_billing_address_for_shipping": 1,
-//     "user_id": 142,
-//     "card_token": "tok_visa"
-// }
