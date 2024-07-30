@@ -41,12 +41,14 @@ Route::post('/users/login', [LoginRegisterControllers::class, 'login']);
 // FOR Admins and Users both
 Route::middleware(['AuthGuard', 'RestrictTo:user,admin'])->group(function () {
     Route::get('/products/get-filter-data', [ProductsController_SA::class, 'getData']);
-    Route::get('/products/get-order-history', [OrderController::class, 'getOrderHistory']);
+    Route::get('/order/get-order-history', [OrderController::class, 'getOrderHistory']);
+
 });
 
 //FOR Users Only
 Route::middleware(['AuthGuard', 'RestrictTo:user', 'CheckEncryption'])->group(function () {
     Route::post('/products/add-to-cart', [AddToCartController::class, 'store']);
+    Route::get('/order/cancel-order/{orderId}', [OrderController::class, 'cancelOrder']);
 
 });
 
