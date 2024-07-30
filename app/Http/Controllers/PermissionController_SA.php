@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\Http\Requests\PermissionRequest_SA;
-use App\Http\Resources\PermissionResource_SA;
+use App\Http\Resources\RolePermissionResource;
 use Spatie\Permission\Models\Permission;
 
 class PermissionController_SA extends Controller
@@ -16,7 +16,7 @@ class PermissionController_SA extends Controller
             'name' => $request->name,
         ]);
 
-        return successResponse("Permission created successfully", PermissionResource_SA::make($permission));
+        return successResponse("Permission created successfully", RolePermissionResource::make($permission));
 
     }
 
@@ -24,7 +24,7 @@ class PermissionController_SA extends Controller
     {
         try {
             $permission = $this->findPermissionById($permissionId);
-            return successResponse("Permission fetched successfully", PermissionResource_SA::make($permission));
+            return successResponse("Permission fetched successfully", RolePermissionResource::make($permission));
 
         } catch (\Exception $e) {
 
@@ -41,7 +41,7 @@ class PermissionController_SA extends Controller
                 'name' => $request->name,
             ]);
 
-            return successResponse("Permission updated successfully", PermissionResource_SA::make($permission));
+            return successResponse("Permission updated successfully", RolePermissionResource::make($permission));
 
         } catch (\Exception $e) {
 
@@ -56,7 +56,7 @@ class PermissionController_SA extends Controller
             $permission = $this->findPermissionById($permissionId);
             $permission->delete();
 
-            return successResponse("Permission deleted successfully", PermissionResource_SA::make($permission));
+            return successResponse("Permission deleted successfully", RolePermissionResource::make($permission));
 
         } catch (\Exception $e) {
 

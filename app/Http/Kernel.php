@@ -69,7 +69,8 @@ class Kernel extends HttpKernel
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         'AuthGuard' => \App\Http\Middleware\ProductGuard::class,
-        'AdminCheck'=>\App\Http\Middleware\RoleMiddleware::class,
-        'PermissionCheck'=> \App\Http\Middleware\PermissionMiddleware::class,
+        'RestrictTo' => \App\Http\Middleware\RoleMiddleware::class,
+        'PermissionCheck' => \App\Http\Middleware\PermissionMiddleware::class,
+        'CheckEncryption' => \App\Http\Middleware\CheckEncrypt::class,
     ];
 }

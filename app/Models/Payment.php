@@ -19,10 +19,10 @@ class Payment extends Model
     ];
 
 
-      // relationship with the Order model
-      public function order()
-      {
-          return $this->belongsTo(Order_SA::class);
-      }
+    // relationship with the Order model
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 
 }

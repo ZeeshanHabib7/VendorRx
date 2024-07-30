@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
 
-class ProductRequest extends FormRequest
+class OrderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,29 +24,24 @@ class ProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'string',
-            'minPrice' => 'numeric|min:0',
-            'maxPrice' => 'numeric',
-            'brand' => 'nullable|string',
-            'startDate' => 'date',
-            'endDate' => 'date',
+            'orderById' => 'string|in:true,false',
+            'fromDate' => 'date|date_format:Y-m-d',
+            'toDate' => 'date|date_format:Y-m-d',
+            'payment_status' => 'string|in:paid,unpaid',
+            'sale_status' => 'string|in:order_placed,order_rejected,order_completed,order_dispatched,order_returned',
             'pageSize' => 'numeric|nullable|min:1',
             'pageNo' => 'numeric|nullable|min:1',
         ];
-
     }
 
     public function messages()
     {
         return [
-            'name.string' => 'The name field must be a string',
-
-            'brand.string' => 'The brand field must be a string',
-
-            'price.integer' => 'The price field must be a integer',
-            'price.min' => 'The price must be minimum of 10',
-            'startDate.date' => 'The date field must be a valid date',
-            'endDate.date' => 'The date field must be a valid date',
+            'orderById.in' => 'OrderById must be [ true or false ]',
+            'payment_status.in' => 'Value must be [ paid or unpaid ]',
+            'sale_status.in' => 'Value must be [ order_placed | order_rejected | order_completed | order_dispatched | order_returned ]',
+            'toDate.date' => 'The date field must be a valid date',
+            'fromDate.date' => 'The date field must be a valid date',
         ];
     }
 
@@ -59,5 +54,4 @@ class ProductRequest extends FormRequest
             'data' => []
         ], 422));
     }
-
 }
