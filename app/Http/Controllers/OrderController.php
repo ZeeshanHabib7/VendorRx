@@ -65,20 +65,19 @@ class OrderController extends Controller
 
         try {
             $userId = getCurrentUserId();
-            //$user = User::find($userId);
 
-            //$order = $user->orders();
             $order = Order::where('user_id', $userId)->find($request["orderId"]);
-            // dd($order);
 
             $order->order_status = 'order_cancelled';
+
             $data = [
                 "non_refundable_amount" => $order->grand_total,
                 "msg" => "Cancelled order data",
                 "order" => Order_Resource::make($order),
             ];
 
-            // $order->save();
+            $order->save();
+
             return successResponse("Your order has been successfully cancelled. Refund not available.", $data);     //code...
 
         } catch (Exception $e) {
