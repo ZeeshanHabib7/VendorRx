@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CouponController;
 use App\Http\Controllers\UserController_FH;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PermissionController_FH;
@@ -50,10 +51,17 @@ Route::middleware(['check.auth',])->group(function () {
         //-------- Fetch User by Id --------
         Route::get('get/{id}', [UserController_FH::class, 'show']);
 
-        //-------- Product Crrate, update, delete Routes --------
+        //-------- Product Create, update, delete Routes --------
         Route::post('product', [ProductController::class, 'create']);
         Route::put('product/{id}', [ProductController::class, 'edit']);
         Route::delete('product/{id}', [ProductController::class, 'destroy']);
+
+        //-------- Coupon CRUD Routes --------
+        Route::get('coupons',[CouponController::class,'index']); 
+        Route::get('coupon/{id}', [CouponController::class, 'show']);
+        Route::post('coupon', [CouponController::class, 'create']);
+        Route::put('coupon/{id}', [CouponController::class, 'edit']);
+        Route::delete('coupon/{id}', [CouponController::class,'destroy']);
 
     });
 
