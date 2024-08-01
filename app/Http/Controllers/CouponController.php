@@ -20,6 +20,7 @@ class CouponController extends Controller implements CrudInterface_FH
     {
         $this->paymentService = $paymentService;
     }
+
 // -- to fetch all coupons with pagination --
     public function index() {
         try {
@@ -52,24 +53,10 @@ class CouponController extends Controller implements CrudInterface_FH
      public function store(array $payload) {
         try {
             // Check if coupon is for product or cart
-            if (array_key_exists("product_id" ,$payload) && !is_null($payload['product_id'])) {
-              // ----- Coupon is for product -----
-                //get product price
-                $product = Product::find($payload["product_id"]);
-                // calculate discounted price
-                $discountedPrice = $this->calculateDiscountedPrice($product->price, $payload);
-             
-                // check discounted price on stripe
-                $pricePayload = $this->generatePricePayload($discountedPrice, $product);
-                $priceId = $this->getStripePriceId($pricePayload); 
-                $payload['stripe_price_id'] = $priceId;
-            } else {
-              // ----- Coupon is for cart -----
-                $payload["stripe_price_id"] = null;
-            }
+            $couponPayload = $this->isProductCoupon($payload);
 
             // Create the coupon
-            $coupon = Coupon::create($payload);
+            $coupon = Coupon::create($couponPayload);
 
             // Create Coupon Codes
             if($coupon) {
@@ -97,7 +84,36 @@ class CouponController extends Controller implements CrudInterface_FH
      
 // -- Delete coupon --
      public function destroy($id) {
+        try {
+            $coupon = Coupon::find($id);
+            $coupon->delete();
+            return successResponse("Coupon Deleted Successfully!");
+        } catch (\Exception $e) {
+            return handleException($e);
+        }
+     }
 
+// -- check if coupon is for product --
+     public function isProductCoupon($payload) {
+        try {
+            if (array_key_exists("product_id" ,$payload) && !is_null($payload['product_id'])) {
+                  //get product price
+                  $product = Product::find($payload["product_id"]);
+
+                  // calculate discounted price
+                  $discountedPrice = $this->calculateDiscountedPrice($product->price, $payload);
+               
+                  // check discounted price on stripe
+                  $pricePayload = $this->generatePricePayload($discountedPrice, $product);
+                  $priceId = $this->getStripePriceId($pricePayload); 
+                  $payload['stripe_price_id'] = $priceId;
+              } 
+
+              return $payload;
+        }         
+        catch (\Exception $e) {
+            throw $e;
+        }
      }
 
 // -- check the discount type and call respective function to calculate the discounted price --
@@ -145,6 +161,7 @@ class CouponController extends Controller implements CrudInterface_FH
 // -- get the product's stripe price id --
      public function getStripePriceId($pricePayload) {
         try {
+            // convert discount price from dollar into cents
             $discountedPrice= $pricePayload['price'] * 100;
 
             // Fetch all prices for the specific product
