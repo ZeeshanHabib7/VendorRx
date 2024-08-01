@@ -23,8 +23,7 @@ class StripePaymentService implements PaymentServiceInterface
                 $payload['customer_id'],
                 ['source' => $payload['token']]
             );
-        } 
-        catch (Exception $e) {
+        } catch (Exception $e) {
             throw $e;
         }
     }
@@ -33,15 +32,14 @@ class StripePaymentService implements PaymentServiceInterface
     {
         try {
             return PaymentIntent::create([
-                'amount' => $payload['amount'] * 100, 
+                'amount' => $payload['amount'] * 100,
                 'currency' => 'usd',
                 'customer' => $payload['customer_id'],
                 'payment_method' => $payload['card_id'],
                 'off_session' => true,
                 'confirm' => true,
             ]);
-        } 
-        catch (Exception $e) {
+        } catch (Exception $e) {
             throw $e;
         }
     }
@@ -53,8 +51,7 @@ class StripePaymentService implements PaymentServiceInterface
                 'name' => $payload['name'],
                 'email' => $payload['email'],
             ]);
-        } 
-        catch (Exception $e) {
+        } catch (Exception $e) {
             throw $e;
         }
     }
@@ -64,25 +61,24 @@ class StripePaymentService implements PaymentServiceInterface
         try {
             // array to be returned
             $result = [];
-              // Create Stripe Product
+            // Create Stripe Product
             $stripeProduct = StripeProduct::create([
                 'name' => $payload['name']
             ]);
-           
+
             // chech if stripe product is created
-            if($stripeProduct){
-              // add stripe product id in result array
-              $result["stripe_product_id"] = $payload["stripe_product_id"] = $stripeProduct->id;
-              // create stripe price for the product created
-              $stripeProduct =  $this->createPrice($payload);
-              // add stripe price id in result array
-              $result['stripe_price_id'] = $stripeProduct->id;
+            if ($stripeProduct) {
+                // add stripe product id in result array
+                $result["stripe_product_id"] = $payload["stripe_product_id"] = $stripeProduct->id;
+                // create stripe price for the product created
+                $stripeProduct = $this->createPrice($payload);
+                // add stripe price id in result array
+                $result['stripe_price_id'] = $stripeProduct->id;
             }
-           
+
             // return the result array
             return $result;
-        } 
-        catch (Exception $e) {
+        } catch (Exception $e) {
             throw $e;
         }
     }
@@ -95,8 +91,7 @@ class StripePaymentService implements PaymentServiceInterface
                 'currency' => 'usd',
                 'product' => $payload['stripe_product_id'],
             ]);
-        } 
-        catch (Exception $e) {
+        } catch (Exception $e) {
             throw $e;
         }
     }
