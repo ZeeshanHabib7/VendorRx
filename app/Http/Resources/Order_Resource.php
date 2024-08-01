@@ -22,7 +22,7 @@ class Order_Resource extends JsonResource
             "order_id" => $this->order_id,
             "items" => $this->item,
             "order_date" => Carbon::parse($this->created_at)->format('j-F-Y, g:i a'),
-            "sale_status" => $this->sale_status,
+            "order_status" => $this->order_status,
             "order_details" => Order_Details_Resource::collection($this->orderDetails),
             "address" => $this->address,
             "qty" => $this->total_quantity,

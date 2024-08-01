@@ -21,6 +21,22 @@ class Order extends Model
         'deleted_at' => 'datetime:Y-m-d H:m:s',
     ];
 
+    protected $fillable = [
+        'reference_no',
+        'user_id',
+        'item',
+        'total_quantity',
+        'total_discount',
+        'total_tax',
+        'total_price',
+        'grand_total',
+        'order_discount',
+        'shipping_cost',
+        'payment_status',
+        'paid_ammount',
+        'order_status',
+        'address',
+    ];
     public function orderDetails(): HasMany
     {
         return $this->hasMany(OrderDetail::class, 'order_id', 'order_id');
