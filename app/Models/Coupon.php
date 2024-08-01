@@ -26,8 +26,20 @@ class Coupon extends Model
         'deleted_at' => 'datetime:Y-m-d H:m:s',
     ];
 
-    public function couponCodes()
-    {
+    // relation with coupon codes
+    public function couponCodes(){
         return $this->hasMany(CouponCode::class, 'coupon_id');
+    }
+
+    // customizing how the model behaves during various events in its lifecycle
+    protected static function boot() {     
+        parent::boot(); // calls the boot method of the parent class. It ensures that any boot logic defined in the parent class is also executed.
+        
+        static::deleting(function ($coupon) { // registers an event listener for the deleting event. The deleting event is fired when a model is about to be soft deleted.
+            // Soft delete associated coupon codes
+            $coupon->couponCodes()->each(function ($couponCode) {
+                $couponCode->delete();
+            });
+        });
     }
 }
