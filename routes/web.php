@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LoginRegisterControllers;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/users/forget-password', [LoginRegisterControllers::class, 'forgetPassword']);
+Route::post('/users/send-email', [LoginRegisterControllers::class, 'sendEmail'])->name('sendEmail');
+Route::get('/users/reset-password/{id}', [LoginRegisterControllers::class, 'resetPasswordPageLoad']);
+Route::post('/users/reset-password', [LoginRegisterControllers::class, 'resetPassword'])->name('resetPassword');
