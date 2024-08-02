@@ -31,6 +31,7 @@ class OrderRequest extends FormRequest
             'sale_status' => 'string|in:order_placed,order_rejected,order_completed,order_dispatched,order_returned',
             'pageSize' => 'numeric|nullable|min:1',
             'pageNo' => 'numeric|nullable|min:1',
+            'orderId' => 'numeric|exists:orders,order_id',
         ];
     }
 

@@ -6,6 +6,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\OrderRequest;
 use App\Http\Resources\Order_Resource;
 use App\Models\Order;
+use App\Models\User;
+use Exception;
 
 
 class OrderController extends Controller
@@ -51,10 +53,38 @@ class OrderController extends Controller
 
 
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             return errorResponse($e->getMessage(), 500);
         }
+
+    }
+
+    public function cancelOrder(OrderRequest $request)
+    {
+
+        try {
+            $userId = getCurrentUserId();
+
+            $order = Order::where('user_id', $userId)->find($request["orderId"]);
+
+            $order->order_status = 'order_cancelled';
+
+            $data = [
+                "non_refundable_amount" => $order->grand_total,
+                "msg" => "Cancelled order data",
+                "order" => Order_Resource::make($order),
+            ];
+
+            $order->save();
+
+            return successResponse("Your order has been successfully cancelled. Refund not available.", $data);     //code...
+
+        } catch (Exception $e) {
+
+            return errorResponse($e->getMessage(), 400);
+        }
+
 
     }
 }
