@@ -57,7 +57,7 @@ Route::middleware(['check.auth',])->group(function () {
         Route::delete('product/{id}', [ProductController::class, 'destroy']);
 
         //-------- Coupon CRUD Routes --------
-        Route::get('coupons',[CouponController::class,'index']); 
+        Route::get('coupons',[CouponController::class,'getCoupons']); 
         Route::get('coupon/{id}', [CouponController::class, 'show']);
         Route::post('coupon', [CouponController::class, 'create']);
         Route::put('coupon/{id}', [CouponController::class, 'edit']);
