@@ -216,7 +216,7 @@ class CouponController extends Controller implements CrudInterface_FH
 // -- Delete coupon --
      public function destroy($id) {
         try {
-            $coupon = Coupon::find($id);
+            $coupon = Coupon::findorfail($id);
             $coupon->delete();
             return successResponse("Coupon deleted Successfully!");
         } catch (\Exception $e) {
@@ -228,8 +228,8 @@ class CouponController extends Controller implements CrudInterface_FH
      public function isProductCoupon($payload) {
         try {
             if (array_key_exists("product_id" ,$payload) && !is_null($payload['product_id'])) {
-                  //get product price
-                  $product = Product::find($payload["product_id"]);
+                  //get product 
+                  $product = Product::findorfail($payload["product_id"]);
 
                   // calculate discounted price
                   $discountedPrice = $this->calculateDiscountedPrice($product->price, $payload);
@@ -249,7 +249,7 @@ class CouponController extends Controller implements CrudInterface_FH
 
 // -- check the discount type and call respective function to calculate the discounted price --
      public function calculateDiscountedPrice($price, $payload) {
-        if($payload['discount_type'] == 'percentage') {
+        if($payload['discount_type'] == 'percent') {
             return $this->percentageDiscount($price, $payload['discount']);
         } 
         else {
