@@ -9,11 +9,14 @@ use App\Models\Coupon;
 use App\Models\CouponCode;
 use App\Models\Product;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class CouponController extends Controller implements CrudInterface_FH
 {
     protected $paymentService;
+    private $isPaginate = false;
     private $defaultPageSize = 10;
+    private $defaultPageNum = 1;
 
     // Injected Service 
     public function __construct(PaymentServiceInterface $paymentService)
@@ -22,13 +25,97 @@ class CouponController extends Controller implements CrudInterface_FH
     }
 
 // -- to fetch all coupons with pagination --
-    public function index() {
+    public function getCoupons(CouponRequest $request) {
         try {
-           $coupons = Coupon::paginate($this->defaultPageSize);
-           return successResponse("Coupon fetched successfully!", CouponResource::collection($coupons),true, 200);
+            // check if there are any request params to filter coupons
+            if ($request->query()) {
+                // calling function to filter products based on request params 
+                $filteredCoupon = $this->filterCoupon($request);
+                // check for pagination and get coupons
+                $coupons = $this->checkPaginationAndGetCoupons($request, $filteredCoupon);
+            }
+            // else fetch all products
+            else {
+                // check for pagination
+                $coupons = $this->checkPaginationAndGetCoupons($request);
+            }
+
+            return successResponse('Coupons fetched successfully!', CouponResource::collection($coupons), $this->isPaginate, 200);
         } catch (\Exception $e) {
             return handleException($e);
         }
+    }
+
+    public function checkPaginationAndGetCoupons($request, $filteredCoupon = null)
+    {
+        try {
+            $pageSize = $request->input('pageSize', $this->defaultPageSize);
+            $pageNum = $request->input('pageNum', $this->defaultPageNum);
+    
+            if ($request->input('paginate')) {
+                $this->isPaginate = true;
+                if ($filteredCoupon) {
+                    return $filteredCoupon->paginate($pageSize, ['*'], 'page', $pageNum);
+                } else {
+                    return Coupon::paginate($pageSize, ['*'], 'page', $pageNum);
+                }
+            } else {
+                $this->isPaginate = false;
+                if ($filteredCoupon) {
+                    return $filteredCoupon->get();
+                } else {
+                    return Coupon::all();                
+                }
+            }
+        } catch (\Exception $e) {
+            throw $e;
+        }
+    }
+    
+    // Filtering coupons with respect to request params
+    public function filterCoupon($request)
+    {
+        return Coupon::when($request->filled('expiry_before') && $request->filled('expiry_after'), function ($query) use ($request) {
+                return $query->whereBetween('expiry', [$request->expiry_before, $request->expiry_after]);
+            })
+            ->when($request->filled('expiry_after'), function ($query) use ($request) {
+                return $query->where('expiry', '>=', $request->expiry_after);
+            })
+            ->when($request->filled('expiry_before'), function ($query) use ($request) {
+                return $query->where('expiry', '<=', $request->expiry_before);
+            })
+            ->when($request->filled('status'), function ($query) use ($request) {
+                return $query->where('status', $request->status);
+            })
+            ->when($request->input('product_id') === 'null', function ($query) {
+                return $query->whereNull('product_id');
+            })
+            ->when($request->filled('product_id') && $request->input('product_id') !== 'null', function ($query) use ($request) {
+                return $query->where('product_id', $request->product_id);
+            })
+            ->when($request->filled('stripe_price_id'), function ($query) use ($request) {
+                return $query->where('stripe_price_id', $request->stripe_price_id);
+            })
+            ->when($request->filled('discount'), function ($query) use ($request) {
+                return $query->where('discount', $request->discount);
+            })
+            ->when($request->filled('discount_type'), function ($query) use ($request) {
+                return $query->where('discount_type', $request->discount_type);
+            })
+            ->when($request->filled('code'), function ($query) use ($request) {
+                return $query->whereHas('couponCodes', function($query) use ($request) {
+                    return $query->where('code', $request->code);
+                });
+            });
+    }
+
+// -- interface function --
+    public function index(){
+        // try {
+        //    return Coupon::paginate($this->defaultPageSize);
+        // } catch (\Exception $e) {
+        //     return handleException($e);
+        // }
     }
 
 // -- get a specific coupon by id --
@@ -51,6 +138,7 @@ class CouponController extends Controller implements CrudInterface_FH
 
  
      public function store(array $payload) {
+        DB::beginTransaction();
         try {
             // Check if coupon is for product or cart
             $couponPayload = $this->isProductCoupon($payload);
@@ -69,17 +157,60 @@ class CouponController extends Controller implements CrudInterface_FH
                $this->generateSingleCouponCode($payload);
             }
 
-            return successResponse("Coupon Created successfully!", CouponResource::make($coupon));
+            DB::commit();
+            return successResponse("Coupon created successfully!", CouponResource::make($coupon));
 
         } catch (\Exception $e) {
+            DB::rollBack();
             return handleException($e);
         }
 
      }
  
 // -- Update coupon --
-     public function update(array $payload, $id) {
 
+     public function edit(CouponRequest $request, $id)
+     {
+        $validatedData = $request->validated();
+        return $this->update($validatedData, $id);
+     }
+
+     public function update(array $payload, $id) {
+        DB::beginTransaction();
+    
+        try {
+            // check if payload has product id
+            if(array_key_exists("product_id",$payload)){
+                // Check if coupon is for product or cart
+                $payload = $this->isProductCoupon($payload);
+            }
+
+            // Find the coupon
+            $coupon = Coupon::findOrFail($id);
+            
+            // Update coupon details
+            $coupon->update($payload);
+    
+            // Update coupon codes if provided
+            if (isset($payload['coupon_codes'])) {
+                foreach ($payload['coupon_codes'] as $codeData) {
+                    // Find the coupon code
+                    $couponCode = CouponCode::findOrFail($codeData['id']);
+                    
+                    // Update coupon code details
+                    $couponCode->update($codeData);
+                }
+            }
+            
+            DB::commit();
+    
+            return successResponse("Coupon and coupon codes updated successfully!", CouponResource::make($coupon));
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return handleException($e);
+        }
+    
      }
      
 // -- Delete coupon --
@@ -87,7 +218,7 @@ class CouponController extends Controller implements CrudInterface_FH
         try {
             $coupon = Coupon::find($id);
             $coupon->delete();
-            return successResponse("Coupon Deleted Successfully!");
+            return successResponse("Coupon deleted Successfully!");
         } catch (\Exception $e) {
             return handleException($e);
         }
