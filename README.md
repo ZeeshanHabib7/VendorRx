@@ -41,7 +41,7 @@ Copy the .env.example file to .env and configure your environment variables.
 cp .env.example .env
 Update the following variables in the .env file according to your local setup:
 
-env
+# env
 APP_NAME=Laravel
 APP_ENV=local
 APP_KEY=base64:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -56,19 +56,21 @@ DB_USERNAME=your_database_user
 DB_PASSWORD=your_database_password
 
 # Other environment variables...
+
 4. Generate Application Key
-
 php artisan key:generate
+
 5. Run Migrations and Seed Database
-
 php artisan migrate --seed
-6. Run the Development Server
 
+6. Run the Development Server
 php artisan serve
+
 7. Compile Assets
 To compile the assets, run:
 
 npm run dev
+
 # or
 yarn dev
 Additional Commands
@@ -77,7 +79,7 @@ To run the tests, use:
 
 php artisan test
 
-Contribution Guidelines
+# Contribution Guidelines
 We appreciate your contributions! Please follow these guidelines:
 
 Fork the repository.
