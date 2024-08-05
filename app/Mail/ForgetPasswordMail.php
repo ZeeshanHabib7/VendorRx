@@ -38,12 +38,7 @@ class ForgetPasswordMail extends Mailable
     {
         return new Content(
             view: 'Mails.forget-password-mail',
-            // with: [
-            //     "url" => $data["url"],
-            //     "email" => $data,
-            //     "title" => "Reset Password Link",
-            //     "body" => "Please click on the below button to reset your password",
-            // ]
+
         );
     }
 
