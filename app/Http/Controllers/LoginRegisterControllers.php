@@ -81,7 +81,7 @@ class LoginRegisterControllers extends Controller
                     "body" => "Please click on the below button to reset your password",
                 ];
 
-                Mail::to('k224187@nu.edu.pk')->send(new ForgetPasswordMail($data));
+                Mail::to($request->email)->send(new ForgetPasswordMail($data));
 
                 return successResponse("Mail sent successfully. Please check your Inbox");
             }
