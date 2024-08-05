@@ -1,15 +1,11 @@
 <?php
-// app/Http/Controllers/BrandController_HR.php
-// app/Http/Controllers/BrandController_HR.php
 
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use App\Http\Requests\StoreBrandRequest;
 use App\Http\Requests\UpdateBrandRequest;
-use App\Http\Helpers\ResponseHelper;
 use App\Http\Resources\BrandResource;
-use Illuminate\Http\Request;
 use Exception;
 
 class BrandController extends Controller
@@ -18,9 +14,9 @@ class BrandController extends Controller
     {
         try {
             $brands = Brand::latest()->get();
-            return successResponse(BrandResource::collection($brands), 'Brands retrieved successfully.');
+            return successResponse('Brands retrieved successfully.', BrandResource::collection($brands));
         } catch (Exception $e) {
-            return errorResponse([], 'Failed to retrieve brands.', 500);
+            return errorResponse('Failed to retrieve brands.', 500);
         }
     }
 
@@ -28,9 +24,9 @@ class BrandController extends Controller
     {
         try {
             $brand = Brand::create($request->validated());
-            return successResponse(new BrandResource($brand), 'Brand created successfully.', 201);
+            return successResponse('Brand created successfully.', new BrandResource($brand), false, 201);
         } catch (Exception $e) {
-            return errorResponse([], 'Failed to create brand.', 500);
+            return errorResponse('Failed to create brand.', 500);
         }
     }
 
@@ -38,9 +34,9 @@ class BrandController extends Controller
     {
         try {
             $brand = Brand::findOrFail($id);
-            return successResponse(new BrandResource($brand), 'Brand retrieved successfully.');
+            return successResponse('Brand retrieved successfully.', new BrandResource($brand));
         } catch (Exception $e) {
-            return errorResponse([], 'Brand not found.', 404);
+            return errorResponse('Brand not found.', 404);
         }
     }
 
@@ -49,9 +45,9 @@ class BrandController extends Controller
         try {
             $brand = Brand::findOrFail($id);
             $brand->update($request->validated());
-            return successResponse(new BrandResource($brand), 'Brand updated successfully.');
+            return successResponse('Brand updated successfully.', new BrandResource($brand));
         } catch (Exception $e) {
-            return errorResponse([], 'Failed to update brand.', 500);
+            return errorResponse('Failed to update brand.', 500);
         }
     }
 
@@ -60,9 +56,9 @@ class BrandController extends Controller
         try {
             $brand = Brand::findOrFail($id);
             $brand->delete();
-            return successResponse([], 'Brand deleted successfully.', 204);
+            return successResponse('Brand deleted successfully.', null, false, 204);
         } catch (Exception $e) {
-            return errorResponse([], 'Failed to delete brand.', 500);
+            return errorResponse('Failed to delete brand.', 500);
         }
     }
 }
