@@ -69,7 +69,7 @@ class LoginRegisterControllers extends Controller
     {
         try {
 
-            $user = User::where('email', $request->email)->first();
+            $user = User::where('email', $request->email)->firstOrFail();
 
             if (!is_null($user)) {
                 $domain = URL::to('/');
@@ -83,11 +83,11 @@ class LoginRegisterControllers extends Controller
 
                 Mail::to('k224187@nu.edu.pk')->send(new ForgetPasswordMail($data));
 
-                return back()->with('success', 'Email sent successfully. Please check your inbox');
+                return successResponse("Mail sent successfully. Please check your Inbox");
             }
 
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
+            return errorResponse($e->getMessage());
         }
     }
 
@@ -95,7 +95,7 @@ class LoginRegisterControllers extends Controller
     {
         try {
 
-            $user = User::where('id', $id)->first();
+            $user = User::where('id', $id)->firstOrFail();
             if (!is_null($user))
                 return view("reset-password")->with('email', $user->email);
 
@@ -109,15 +109,17 @@ class LoginRegisterControllers extends Controller
     {
         try {
 
-            $user = User::where('email', $request->email)->first();
+            $user = User::where('email', $request->email)->firstOrFail();
 
             $user->password = $request->password;
             $user->save();
 
-            return back()->with('success', "Password changed successfully");
+            return successResponse("Password Changed successfully");
 
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
+            dd($e);
+            return errorResponse($e->getMessage());
+
         }
     }
 }
