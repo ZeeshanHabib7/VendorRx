@@ -4,92 +4,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ asset('css/reset-password.css') }}" rel="stylesheet">
     <title>Reset Pasword</title>
+    <style>
+        .form-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            height: 400px;
+            width: 300px;
+            padding: 70px 40px;
+            padding-bottom: 95px;
+            border-radius: 10px;
+            border: 1px solid rgb(19, 92, 226);
+        }
+    </style>
 </head>
-<style>
-    body {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        font-family: sans-serif;
-    }
 
-    .form-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        height: 300px;
-        width: 300px;
-        padding: 70px 40px;
-        border-radius: 10px;
-        background-color: rgb(214, 224, 241);
-        border: 1px solid rgb(19, 92, 226);
-    }
-
-    form {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        width: 100%;
-    }
-
-    form label {
-        font-size: 1.3vw;
-        font-family: sans-serif;
-        font-weight: 400;
-    }
-
-    form input {
-        /* width: 100%; */
-        font-family: sans-serif;
-        border-radius: 6px;
-        padding: 8px;
-        border: 1px solid rgb(19, 92, 226);
-    }
-
-    form button:hover {
-        background-color: white;
-        border: 1px solid rgb(19, 92, 226);
-        color: rgb(19, 92, 226);
-    }
-
-    form button {
-        background-color: rgb(19, 92, 226);
-        border-radius: 6px;
-        border: none;
-        padding: 8px 0px;
-        color: white;
-        cursor: pointer;
-    }
-
-    form p {
-        font-family: sans-serif;
-    }
-</style>
 
 <body>
     <div class="form-container">
-        <form action="{{route('resetPassword')}}" method="POST">
+        <img src="{{asset("logo.png")}}" alt="VendorX Logo" height="150" style="margin-top:20px">
+        <form id="reset-password">
             @csrf
             <h2>Reset Password</h2>
             <label for="Email">Email</label>
-            <input type="email" name="email" value="{{$email}}" required placeholder="eg:example@gmail.com">
+            <input type="email" name="email" value="{{$email}}" required readonly>
             <label for="password">Password</label>
             <input type="password" name="password" required>
             <label for="confirmPassword">Confirm Password</label>
             <input type="password" name="password_confirmation" required>
             <button type="submit">Change Password</button>
         </form>
-        @if (session('success'))
-            <p style="font-size: 1vw; color:green; margin-top:30px;"><i>{{ session('success') }}</i></p>
-        @endif
-        @if ($errors->any())
-            <p style="font-size: 1vw; color:red; margin-top:30px;">{{ $errors->first() }}</p>
-        @endif
-    </div>
 
+        <div class="message-container" style="margin-top:30px;">
+
+            <p style="font-size: 1vw; color:green;  " id="success"><i></i></p>
+            <p style="font-size: 1vw; color:red;" id="errors"><i></i></p>
+        </div>
+
+    </div>
+    <script>
+        // Pass CSRF token and route to JavaScript
+        const csrfToken = '{{ csrf_token() }}';
+        const resetPasswordRoute = '{{ route('resetPassword') }}';
+
+    </script>
+    <script type="text/javascript" src="{{ asset('JS/reset-password.js') }}"></script>
 </body>
 
 </html>
