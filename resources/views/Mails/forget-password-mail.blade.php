@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{$mailData['title']}}</title>
+    <link href="{{ asset('css/mail.css') }}" rel="stylesheet">
 </head>
-<!-- <style>
+<style>
     body {
         display: flex;
         align-items: center;
@@ -23,8 +24,8 @@
         width: 400px;
         padding: 0 40px;
         border-radius: 10px;
-        background-color: rgb(236, 211, 236);
         border: 1px solid rgb(19, 92, 226);
+        gap: 10px;
     }
 
     button:hover {
@@ -37,16 +38,15 @@
         background-color: rgb(19, 92, 226);
         border-radius: 6px;
         border: none;
-        padding: 8px 0px;
+        padding: 8px 8px;
         color: white;
         cursor: pointer;
     }
 
     a {
         text-decoration: none;
-
     }
-</style> -->
+</style>
 
 <body>
     <div class="container">
