@@ -69,6 +69,12 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Order::class, 'user_id', 'user_id');
     }
 
+    // relationship with the CouponUsage model
+    public function couponUsages()
+    {
+        return $this->hasMany(CouponUsage::class);
+    }
+
     // user creation / signup
     public function createNewUser($payload, $paymentService)
     {
