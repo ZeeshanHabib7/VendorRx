@@ -85,4 +85,10 @@ class Product extends Model
 
         return $query;
     }
+
+     // relationship with the CouponUsage model
+     public function couponUsages()
+     {
+        return $this->hasMany(CouponUsage::class);
+     }
 }
