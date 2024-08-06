@@ -42,4 +42,10 @@ class Coupon extends Model
             });
         });
     }
+
+    // Check if the coupon has been used
+    public function isUsed()
+    {
+        return $this->couponUsages()->exists();
+    }
 }
