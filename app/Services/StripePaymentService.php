@@ -95,4 +95,15 @@ class StripePaymentService implements PaymentServiceInterface
             throw $e;
         }
     }
+
+    public function getPriceByProductId($productId) {
+        try {
+            return StripePrice::all([
+                'product' => $productId
+            ]);
+        } 
+        catch (Exception $e) {
+            throw $e;
+        }
+    }
 }

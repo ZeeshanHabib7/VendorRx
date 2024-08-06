@@ -27,7 +27,7 @@ class OrderRequest extends FormRequest
             'orderById' => 'string|in:true,false',
             'fromDate' => 'date|date_format:Y-m-d',
             'toDate' => 'date|date_format:Y-m-d',
-            'payment_status' => 'string|in:paid,unpaid',
+            'payment_status' => 'string',
             'sale_status' => 'string|in:order_placed,order_rejected,order_completed,order_dispatched,order_returned',
             'pageSize' => 'numeric|nullable|min:1',
             'pageNo' => 'numeric|nullable|min:1',
@@ -39,7 +39,6 @@ class OrderRequest extends FormRequest
     {
         return [
             'orderById.in' => 'OrderById must be [ true or false ]',
-            'payment_status.in' => 'Value must be [ paid or unpaid ]',
             'sale_status.in' => 'Value must be [ order_placed | order_rejected | order_completed | order_dispatched | order_returned ]',
             'toDate.date' => 'The date field must be a valid date',
             'fromDate.date' => 'The date field must be a valid date',

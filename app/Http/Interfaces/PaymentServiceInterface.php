@@ -18,4 +18,7 @@ interface PaymentServiceInterface
 
     // Create Price 
     public function createPrice(array $payload);
+
+    // Get Price By Product Id
+    public function getPriceByProductId($productId);
 }
