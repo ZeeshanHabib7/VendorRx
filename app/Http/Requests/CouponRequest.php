@@ -37,8 +37,9 @@ class CouponRequest extends FormRequest
                 'usage_limit' => 'integer|min:1',
                 'discount'=> 'integer',
                 'discount_type' => 'string|in:percent,flat',
-                'pageSize' => 'numeric|nullable|min:1',
-                'pageNo' => 'numeric|nullable|min:1',
+                'perPage' => 'sometimes|integer|min:1',
+                'pagination' => 'sometimes|boolean',
+                'page' => 'sometimes|integer|min:1',
             ];
         }
         // Rule for create method
