@@ -15,8 +15,7 @@ class CouponController extends Controller implements CrudInterface_FH
 {
     protected $paymentService;
     private $isPaginate = false;
-    private $defaultPageSize = 10;
-    private $defaultPageNum = 1;
+    private $noOfRecordPerPage = 10;
 
     // Injected Service 
     public function __construct(PaymentServiceInterface $paymentService)
@@ -49,22 +48,21 @@ class CouponController extends Controller implements CrudInterface_FH
     public function checkPaginationAndGetCoupons($request, $filteredCoupon = null)
     {
         try {
-            $pageSize = $request->input('pageSize', $this->defaultPageSize);
-            $pageNum = $request->input('pageNum', $this->defaultPageNum);
+            $noOfRecordPerPage = $request->input('perPage', $this->noOfRecordPerPage);
     
-            if ($request->input('paginate')) {
+            if (isset($request['pagination']) && !empty($request['pagination'])) {
                 $this->isPaginate = true;
                 if ($filteredCoupon) {
-                    return $filteredCoupon->paginate($pageSize, ['*'], 'page', $pageNum);
+                    return $filteredCoupon->paginate($noOfRecordPerPage);
                 } else {
-                    return Coupon::paginate($pageSize, ['*'], 'page', $pageNum);
+                    return Coupon::paginate($noOfRecordPerPage);
                 }
             } else {
                 $this->isPaginate = false;
                 if ($filteredCoupon) {
                     return $filteredCoupon->get();
                 } else {
-                    return Coupon::all();                
+                    return $this->index();            
                 }
             }
         } catch (\Exception $e) {
@@ -110,12 +108,12 @@ class CouponController extends Controller implements CrudInterface_FH
     }
 
 // -- interface function --
-    public function index(){
-        // try {
-        //    return Coupon::paginate($this->defaultPageSize);
-        // } catch (\Exception $e) {
-        //     return handleException($e);
-        // }
+    public function index() {
+        try{
+         return Coupon::all();
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 
 // -- get a specific coupon by id --
@@ -179,14 +177,19 @@ class CouponController extends Controller implements CrudInterface_FH
         DB::beginTransaction();
     
         try {
+            // Find the coupon
+            $coupon = Coupon::findOrFail($id);
+
+            // check if the coupon has been used
+            if($coupon->isUsed()) {
+                return errorResponse("Cannot update the coupon because it has already been used.", 400);
+            }
+
             // check if payload has product id
             if(array_key_exists("product_id",$payload)){
                 // Check if coupon is for product or cart
                 $payload = $this->isProductCoupon($payload);
             }
-
-            // Find the coupon
-            $coupon = Coupon::findOrFail($id);
             
             // Update coupon details
             $coupon->update($payload);
