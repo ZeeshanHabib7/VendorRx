@@ -23,13 +23,13 @@ class AddToCartRequest_SA extends FormRequest
      */
     public function rules(): array
     {
-        // dd($this->request);
+      
         return [
             "products" => "required | array",
             'products.*.product_id' => 'required|integer|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
             "billing_address" => "required|string",
-            "card_id" => "required|string",
+            //"card_id" => "required|string",
             "order_discount" => "integer",
         ];
     }
