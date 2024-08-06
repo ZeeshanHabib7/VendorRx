@@ -28,4 +28,16 @@ class CouponCode extends Model
      {
          return $this->belongsTo(Coupon::class);
      }
+
+     // relationship with the CouponUsage model
+     public function couponUsages()
+     {
+        return $this->hasMany(CouponUsage::class);
+     }
+
+     // Check if the coupon has been used
+     public function isUsed()
+     {
+        return $this->couponUsages()->exists();
+     }
 }
