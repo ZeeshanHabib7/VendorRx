@@ -50,11 +50,13 @@
 
 <body>
     <div class="container">
+        <img src="{{ asset('logo.png') }}" alt="logo" height="100">
         <h1>Forget Passoword</h1>
         <p>{{$mailData['body']}}</p>
         <a href="{{$mailData['url']}}"><button>Reset Passoword</button></a>
 
     </div>
 </body>
+{{dd("test")}}
 
 </html>
