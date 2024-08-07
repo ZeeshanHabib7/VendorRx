@@ -91,7 +91,7 @@ class AddToCartController extends Controller
 
             //Initializing the fields for our Order table
             $order->total_tax = $order->total_price * 0.17;
-            $order->grand_total = $total + $order->total_tax;
+            $order->grand_total = round($total + $order->total_tax,2);
             $order->paid_ammount = $order->grand_total;
 
             // Process Payment
