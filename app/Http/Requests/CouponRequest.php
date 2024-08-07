@@ -49,11 +49,13 @@ class CouponRequest extends FormRequest
                 'status' => 'string|in:active,deactive',
                 'expiry' => 'required|date',
                 'product_id' => 'nullable|exists:products,id',
-                'code_count' => 'required|min:1',
+                'code_count' => 'sometimes|min:1',
                 'usage_limit' => 'sometimes|integer|min:1',
                 'usage_per_user' => 'sometimes|integer|min:1',
                 'discount'=> 'required|integer',
-                'discount_type' => 'string|in:percent,flat'
+                'discount_type' => 'string|in:percent,flat',
+                'is_multi' => 'required|boolean',
+                'codes' => 'sometimes|array'
             ];
         }
         // Rule for update method
