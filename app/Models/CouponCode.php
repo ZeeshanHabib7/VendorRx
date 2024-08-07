@@ -34,10 +34,5 @@ class CouponCode extends Model
      {
         return $this->hasMany(CouponUsage::class);
      }
-
-     // Check if the coupon has been used
-     public function isUsed()
-     {
-        return $this->couponUsages()->exists();
-     }
+     
 }
