@@ -15,7 +15,10 @@ class ProductCollection extends JsonResource
             'id' => $this->id,
             'name'=> $this->name,
             'price'=> $this->price,
-            'brand'=> $this->brand,
+            'brand_id'=> $this->brand_id,
+            'category_id' => $this->category_id,
+            'cost' => $this->cost,
+            'discount' => $this->discount,
             "stripe_product_id" => $this->stripe_product_id,
             "stripe_price_id" => $this->stripe_price_id,
         ];
