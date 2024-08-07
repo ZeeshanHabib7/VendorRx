@@ -7,6 +7,7 @@ use App\Http\Requests\CouponRequest;
 use App\Http\Resources\CouponResource;
 use App\Models\Coupon;
 use App\Models\CouponCode;
+use App\Models\CouponUsage;
 use App\Models\Product;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -178,10 +179,13 @@ class CouponController extends Controller implements CrudInterface_FH
     
         try {
             // Find the coupon
-            $coupon = Coupon::findOrFail($id);
+            $coupon = Coupon::with("CouponCodes")->findOrFail($id);
 
-            // check if the coupon has been used
-            if($coupon->isUsed()) {
+            // Get the coupon IDs from the coupon codes table
+            $couponIds = $coupon->couponCodes->pluck('id');
+
+            // Check if any of these coupon IDs have been used
+            if(CouponUsage::whereIn('coupon_code_id', $couponIds)->exists()) {
                 return errorResponse("Cannot update the coupon because it has already been used.", 400);
             }
 
