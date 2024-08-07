@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name')->comment('Coupon name for easier management');
             $table->enum('status', ['active', 'deactive'])->default('deactive');
             $table->string('stripe_price_id')->nullable();
-            $table->bigInteger('product_id')->nullable();
+            $table->unsignedBigInteger('product_id')->nullable();
             $table->enum('discount_type', ['percent', 'flat'])->default('percent');
             $table->decimal('discount', 10, 2);
             $table->date('expiry');
