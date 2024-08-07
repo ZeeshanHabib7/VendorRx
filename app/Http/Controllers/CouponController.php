@@ -149,11 +149,26 @@ class CouponController extends Controller implements CrudInterface_FH
             if($coupon) {
                 $payload['coupon_id'] = $coupon->id;
             }
-    
-            if (array_key_exists("code_count" ,$payload) && $payload['code_count'] > 1) {
-               $this->generateMultipleCouponCodes($payload);
-            } else {
-               $this->generateSingleCouponCode($payload);
+
+            // check if admin is giving the coupon code(s)
+            if (isset($payload['is_multi']) && !empty($payload['is_multi'])) {
+                // Save the provided coupon codes(s)
+                foreach ($payload['codes'] as $code) {
+                    CouponCode::create([
+                        'coupon_id' => $coupon->id,
+                        'code' => $code,
+                        'usage_limit' => $payload["usage_limit"],
+                        'usage_per_user' => $payload["usage_per_user"]
+                    ]);
+                }
+            }
+            // else create random code(s) as per code_count 
+            else {
+                if (array_key_exists("code_count" ,$payload) && $payload['code_count'] > 1) {
+                $this->generateMultipleCouponCodes($payload);
+                } else {
+                $this->generateSingleCouponCode($payload);
+                }
             }
 
             DB::commit();
@@ -372,7 +387,7 @@ class CouponController extends Controller implements CrudInterface_FH
      private function sanitizeCode($couponName)
      {
          // Remove special characters, replace spaces with hyphens, and convert to uppercase
-         return strtoupper(preg_replace('/[^A-Za-z0-9]+/', '-', $couponName));
+         return preg_replace('/[^A-Za-z0-9]+/', '-', $couponName);
      }
  
 }
