@@ -35,7 +35,7 @@ class CouponRequest extends FormRequest
                 'expiry_before' => 'date',
                 'expiry_after' => 'date',
                 'usage_limit' => 'integer|min:1',
-                'discount'=> 'integer',
+                'discount'=> 'numeric',
                 'discount_type' => 'string|in:percent,flat',
                 'perPage' => 'sometimes|integer|min:1',
                 'pagination' => 'sometimes|boolean',
@@ -49,33 +49,25 @@ class CouponRequest extends FormRequest
                 'status' => 'string|in:active,deactive',
                 'expiry' => 'required|date',
                 'product_id' => 'nullable|exists:products,id',
-                'code_count' => 'sometimes|min:1',
                 'usage_limit' => 'sometimes|integer|min:1',
                 'usage_per_user' => 'sometimes|integer|min:1',
-                'discount'=> 'required|integer',
+                'discount'=> 'required|numeric',
                 'discount_type' => 'string|in:percent,flat',
-                'is_multi' => 'required|boolean',
-                'codes' => 'sometimes|array'
+                'is_multi' => 'required|boolean',  
+                'code_count' => 'required_if:is_multi,true|nullable|integer|min:2',
+                'code' => 'required_if:is_multi,false|nullable|string'
             ];
         }
         // Rule for update method
         elseif ($this->isMethod('patch') || $this->isMethod('put')) {
-             $id = $this->route('id') ? $this->route('id') : null;
             return [
                 'name' => 'required|string',
                 'status' => 'string|in:active,deactive',
                 'expiry' => 'required|date',
-                'stripe_price_id' => 'nullable|string',
                 'product_id' => 'nullable|exists:products,id',
-                'discount'=> 'required|integer',
+                'discount'=> 'required|numeric',
                 'discount_type' => 'string|in:percent,flat',
-                'coupon_codes' => 'nullable|array',
                 'coupon_codes.*.id' => 'required|exists:coupon_codes,id',
-                'coupon_codes.*.code' => [
-                    'required',
-                    'string',
-                    Rule::unique('coupon_codes', 'code')->ignore($id)
-                ],
                 'coupon_codes.*.usage_limit' => 'sometimes|integer',
                 'coupon_codes.*.usage_per_user' => 'sometimes|integer',
 
