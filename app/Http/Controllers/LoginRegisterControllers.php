@@ -95,9 +95,7 @@ class LoginRegisterControllers extends Controller
     {
         try {
 
-            $user = User::where('id', $id)->firstOrFail();
-            if (!is_null($user))
-                return view("reset-password")->with('email', $user->email);
+            return view("reset-password")->with('id', $id);
 
         } catch (\Exception $e) {
             return errorResponse($e->getMessage());
@@ -105,11 +103,11 @@ class LoginRegisterControllers extends Controller
 
     }
 
-    public function resetPassword(ResetPasswordRequest $request)
+    public function resetPassword(ResetPasswordRequest $request, $userId)
     {
         try {
 
-            $user = User::where('email', $request->email)->firstOrFail();
+            $user = User::where('id', $userId)->firstOrFail();
 
             $user->password = $request->password;
             $user->save();
@@ -117,7 +115,7 @@ class LoginRegisterControllers extends Controller
             return successResponse("Password Changed successfully");
 
         } catch (\Exception $e) {
-            dd($e);
+
             return errorResponse($e->getMessage());
 
         }
