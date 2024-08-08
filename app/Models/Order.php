@@ -53,6 +53,13 @@ class Order extends Model
         return $this->hasOne(Payment::class);
 
     }
+
+    // relationship with the CouponUsage model
+    public function couponUsages()
+    {
+        return $this->hasMany(CouponUsage::class);
+    }
+
     protected function getFilterOrders(OrderRequest $request, $userId = null)
     {
         try {

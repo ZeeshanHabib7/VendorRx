@@ -23,9 +23,21 @@ class CouponCode extends Model
         'deleted_at' => 'datetime:Y-m-d H:m:s',
     ];
 
+    public function setCodeAttribute($value)
+    {
+        $this->attributes['code'] = strtoupper($value);
+    }
+
      // relationship with the coupon model
      public function coupon()
      {
          return $this->belongsTo(Coupon::class);
      }
+
+     // relationship with the CouponUsage model
+     public function couponUsages()
+     {
+        return $this->hasMany(CouponUsage::class);
+     }
+     
 }

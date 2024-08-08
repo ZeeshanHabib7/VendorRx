@@ -7,6 +7,7 @@ use App\Http\Requests\CouponRequest;
 use App\Http\Resources\CouponResource;
 use App\Models\Coupon;
 use App\Models\CouponCode;
+use App\Models\CouponUsage;
 use App\Models\Product;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -15,8 +16,7 @@ class CouponController extends Controller implements CrudInterface_FH
 {
     protected $paymentService;
     private $isPaginate = false;
-    private $defaultPageSize = 10;
-    private $defaultPageNum = 1;
+    private $noOfRecordPerPage = 10;
 
     // Injected Service 
     public function __construct(PaymentServiceInterface $paymentService)
@@ -49,22 +49,21 @@ class CouponController extends Controller implements CrudInterface_FH
     public function checkPaginationAndGetCoupons($request, $filteredCoupon = null)
     {
         try {
-            $pageSize = $request->input('pageSize', $this->defaultPageSize);
-            $pageNum = $request->input('pageNum', $this->defaultPageNum);
+            $noOfRecordPerPage = $request->input('perPage', $this->noOfRecordPerPage);
     
-            if ($request->input('paginate')) {
+            if (isset($request['pagination']) && !empty($request['pagination'])) {
                 $this->isPaginate = true;
                 if ($filteredCoupon) {
-                    return $filteredCoupon->paginate($pageSize, ['*'], 'page', $pageNum);
+                    return $filteredCoupon->paginate($noOfRecordPerPage);
                 } else {
-                    return Coupon::paginate($pageSize, ['*'], 'page', $pageNum);
+                    return Coupon::paginate($noOfRecordPerPage);
                 }
             } else {
                 $this->isPaginate = false;
                 if ($filteredCoupon) {
                     return $filteredCoupon->get();
                 } else {
-                    return Coupon::all();                
+                    return $this->index();            
                 }
             }
         } catch (\Exception $e) {
@@ -110,12 +109,12 @@ class CouponController extends Controller implements CrudInterface_FH
     }
 
 // -- interface function --
-    public function index(){
-        // try {
-        //    return Coupon::paginate($this->defaultPageSize);
-        // } catch (\Exception $e) {
-        //     return handleException($e);
-        // }
+    public function index() {
+        try{
+         return Coupon::all();
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 
 // -- get a specific coupon by id --
@@ -150,11 +149,17 @@ class CouponController extends Controller implements CrudInterface_FH
             if($coupon) {
                 $payload['coupon_id'] = $coupon->id;
             }
-    
-            if (array_key_exists("code_count" ,$payload) && $payload['code_count'] > 1) {
-               $this->generateMultipleCouponCodes($payload);
-            } else {
-               $this->generateSingleCouponCode($payload);
+
+            // check for multiple random codes
+            if (isset($payload['is_multi']) && !empty($payload['is_multi'])) {
+                // create random codes as per code_count 
+                if (array_key_exists("code_count" ,$payload) && $payload['code_count'] > 1) {
+                    $this->generateMultipleCouponCodes($payload);
+                }
+            }
+            // else create the provided coupon code  given by admin
+            else {
+                $this->generateSingleCouponCode($payload);
             }
 
             DB::commit();
@@ -179,21 +184,30 @@ class CouponController extends Controller implements CrudInterface_FH
         DB::beginTransaction();
     
         try {
+            // Find the coupon
+            $coupon = Coupon::with("CouponCodes")->findOrFail($id);
+
+            // Get the coupon IDs from the coupon codes table
+            $couponIds = $coupon->couponCodes->pluck('id');
+
+            // Check if any of these coupon IDs have been used
+            if(CouponUsage::whereIn('coupon_code_id', $couponIds)->exists()) {
+                return errorResponse("Cannot update the coupon because it has already been used.", 400);
+            }
+
             // check if payload has product id
             if(array_key_exists("product_id",$payload)){
                 // Check if coupon is for product or cart
                 $payload = $this->isProductCoupon($payload);
             }
-
-            // Find the coupon
-            $coupon = Coupon::findOrFail($id);
             
             // Update coupon details
             $coupon->update($payload);
-    
+           
             // Update coupon codes if provided
             if (isset($payload['coupon_codes'])) {
                 foreach ($payload['coupon_codes'] as $codeData) {
+                 
                     // Find the coupon code
                     $couponCode = CouponCode::findOrFail($codeData['id']);
                     
@@ -201,10 +215,13 @@ class CouponController extends Controller implements CrudInterface_FH
                     $couponCode->update($codeData);
                 }
             }
+
+            // Reload the coupon with updated coupon codes
+            $updatedCoupon = Coupon::with('couponCodes')->findOrFail($id);
             
             DB::commit();
     
-            return successResponse("Coupon and coupon codes updated successfully!", CouponResource::make($coupon));
+            return successResponse("Coupon and coupon codes updated successfully!", CouponResource::make($updatedCoupon));
     
         } catch (\Exception $e) {
             DB::rollBack();
@@ -346,12 +363,9 @@ class CouponController extends Controller implements CrudInterface_FH
      private function generateSingleCouponCode($payload)
     {
         try {
-            $couponName = $this->sanitizeCode($payload['name']);
-            $uniqueCode = $couponName . '-' . Str::upper(Str::random(4)); 
-
             return CouponCode::create([
                 'coupon_id' => $payload["coupon_id"],
-                'code' => $uniqueCode,
+                'code' => $payload['code'],
                 'usage_limit' => $payload["usage_limit"],
                 'usage_per_user' => $payload["usage_per_user"],
             ]);
@@ -365,7 +379,7 @@ class CouponController extends Controller implements CrudInterface_FH
      private function sanitizeCode($couponName)
      {
          // Remove special characters, replace spaces with hyphens, and convert to uppercase
-         return strtoupper(preg_replace('/[^A-Za-z0-9]+/', '-', $couponName));
+         return preg_replace('/[^A-Za-z0-9]+/', '-', $couponName);
      }
  
 }
