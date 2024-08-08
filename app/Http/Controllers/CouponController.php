@@ -150,25 +150,16 @@ class CouponController extends Controller implements CrudInterface_FH
                 $payload['coupon_id'] = $coupon->id;
             }
 
-            // check if admin is giving the coupon code(s)
+            // check for multiple random codes
             if (isset($payload['is_multi']) && !empty($payload['is_multi'])) {
-                // Save the provided coupon codes(s)
-                foreach ($payload['codes'] as $code) {
-                    CouponCode::create([
-                        'coupon_id' => $coupon->id,
-                        'code' => $code,
-                        'usage_limit' => $payload["usage_limit"],
-                        'usage_per_user' => $payload["usage_per_user"]
-                    ]);
+                // create random codes as per code_count 
+                if (array_key_exists("code_count" ,$payload) && $payload['code_count'] > 1) {
+                    $this->generateMultipleCouponCodes($payload);
                 }
             }
-            // else create random code(s) as per code_count 
+            // else create the provided coupon code  given by admin
             else {
-                if (array_key_exists("code_count" ,$payload) && $payload['code_count'] > 1) {
-                $this->generateMultipleCouponCodes($payload);
-                } else {
                 $this->generateSingleCouponCode($payload);
-                }
             }
 
             DB::commit();
@@ -212,10 +203,11 @@ class CouponController extends Controller implements CrudInterface_FH
             
             // Update coupon details
             $coupon->update($payload);
-    
+           
             // Update coupon codes if provided
             if (isset($payload['coupon_codes'])) {
                 foreach ($payload['coupon_codes'] as $codeData) {
+                 
                     // Find the coupon code
                     $couponCode = CouponCode::findOrFail($codeData['id']);
                     
@@ -223,10 +215,13 @@ class CouponController extends Controller implements CrudInterface_FH
                     $couponCode->update($codeData);
                 }
             }
+
+            // Reload the coupon with updated coupon codes
+            $updatedCoupon = Coupon::with('couponCodes')->findOrFail($id);
             
             DB::commit();
     
-            return successResponse("Coupon and coupon codes updated successfully!", CouponResource::make($coupon));
+            return successResponse("Coupon and coupon codes updated successfully!", CouponResource::make($updatedCoupon));
     
         } catch (\Exception $e) {
             DB::rollBack();
@@ -368,12 +363,9 @@ class CouponController extends Controller implements CrudInterface_FH
      private function generateSingleCouponCode($payload)
     {
         try {
-            $couponName = $this->sanitizeCode($payload['name']);
-            $uniqueCode = $couponName . '-' . Str::upper(Str::random(4)); 
-
             return CouponCode::create([
                 'coupon_id' => $payload["coupon_id"],
-                'code' => $uniqueCode,
+                'code' => $payload['code'],
                 'usage_limit' => $payload["usage_limit"],
                 'usage_per_user' => $payload["usage_per_user"],
             ]);
