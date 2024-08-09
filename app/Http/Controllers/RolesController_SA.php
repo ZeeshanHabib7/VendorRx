@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RolesRequest_SA;
-use App\Http\Resources\RolesResource_SA;
-use App\Interfaces\CRUD_Operations_Interface_SA;
-use Illuminate\Http\Request;
+use App\Http\Resources\RolePermissionResource;
 use Spatie\Permission\Models\Role;
 
 class RolesController_SA extends Controller
@@ -21,7 +19,7 @@ class RolesController_SA extends Controller
             'name' => $request->name,
         ]);
 
-        return successResponse("Role created successfully", RolesResource_SA::make($role));
+        return successResponse("Role created successfully", RolePermissionResource::make($role));
 
     }
 
@@ -29,7 +27,7 @@ class RolesController_SA extends Controller
     {
         try {
             $role = $this->findRolesById($roleId);
-            return successResponse("Role found successfully", RolesResource_SA::make($role));
+            return successResponse("Role found successfully", RolePermissionResource::make($role));
 
         } catch (\Exception $e) {
 
@@ -46,7 +44,7 @@ class RolesController_SA extends Controller
                 'name' => $request->name,
             ]);
 
-            return successResponse("Role updated successfully", RolesResource_SA::make($role));
+            return successResponse("Role updated successfully", RolePermissionResource::make($role));
 
         } catch (\Exception $e) {
 
@@ -61,7 +59,7 @@ class RolesController_SA extends Controller
             $role = $this->findRolesById($roleId);
             $role->delete();
 
-            return successResponse("Role deleted successfully", RolesResource_SA::make($role));
+            return successResponse("Role deleted successfully", RolePermissionResource::make($role));
 
         } catch (\Exception $e) {
 

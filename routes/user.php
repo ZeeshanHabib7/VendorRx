@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CouponController;
 use App\Http\Controllers\UserController_FH;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PermissionController_FH;
@@ -16,7 +17,7 @@ Route::post('signup', [AuthController::class,'signUp']);
 Route::middleware(['check.auth',])->group(function () {
     Route::post('me', [AuthController::class,'me']); //user route
     Route::post('logout', [AuthController::class,'logout']);
-    
+ 
                         // Routes only accessed by super admin
     Route::group(['middleware' => ['role:superAdmin']], function () {
 
@@ -33,9 +34,9 @@ Route::middleware(['check.auth',])->group(function () {
             Route::delete('/role/{id}', [RoleController_FH::class, 'destroy']);
 
         //-------- Users create, update, delete Route --------
-            Route::post('create', [UserController_FH::class, 'create']);
-            Route::put('edit/{id}', [UserController_FH::class, 'edit']);
-            Route::delete('delete/{id}', [UserController_FH::class, 'destroy']);
+            Route::post('/create', [UserController_FH::class, 'create']);
+            Route::put('/{id}', [UserController_FH::class, 'edit']);
+            Route::delete('/{id}', [UserController_FH::class, 'destroy']);
 
     });
 
@@ -50,10 +51,17 @@ Route::middleware(['check.auth',])->group(function () {
         //-------- Fetch User by Id --------
         Route::get('get/{id}', [UserController_FH::class, 'show']);
 
-        //-------- Product Crrate, update, delete Routes --------
+        //-------- Product Create, update, delete Routes --------
         Route::post('product', [ProductController::class, 'create']);
         Route::put('product/{id}', [ProductController::class, 'edit']);
         Route::delete('product/{id}', [ProductController::class, 'destroy']);
+
+        //-------- Coupon CRUD Routes --------
+        Route::get('coupons',[CouponController::class,'getCoupons']); 
+        Route::get('coupon/{id}', [CouponController::class, 'show']);
+        Route::post('coupon', [CouponController::class, 'create']);
+        Route::put('coupon/{id}', [CouponController::class, 'edit']);
+        Route::delete('coupon/{id}', [CouponController::class,'destroy']);
 
     });
 
@@ -65,4 +73,3 @@ Route::middleware(['check.auth',])->group(function () {
 
     
 });
-?>

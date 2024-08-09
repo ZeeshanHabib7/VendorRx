@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
 
 class ProductRequest extends FormRequest
 {
@@ -25,24 +25,28 @@ class ProductRequest extends FormRequest
     {
         return [
             'name' => 'string',
-            'price' => 'numeric|min:0|max:999999.99',
-            'date' => 'date|nullable',
-            'brand' => 'string|nullable',
-            'pageNum' => 'sometimes|integer|min:1',
-            'pageSize' => 'sometimes|integer|min:1',
+            'minPrice' => 'numeric|min:0',
+            'maxPrice' => 'numeric',
+            'brand' => 'nullable|string',
+            'startDate' => 'date',
+            'endDate' => 'date',
+            'pageSize' => 'numeric|nullable|min:1',
+            'pageNo' => 'numeric|nullable|min:1',
         ];
+
     }
 
-    public function messages(){
-        return[
+    public function messages()
+    {
+        return [
             'name.string' => 'The name field must be a string',
 
             'brand.string' => 'The brand field must be a string',
 
             'price.integer' => 'The price field must be a integer',
             'price.min' => 'The price must be minimum of 10',
-
-            'date.date' => 'The date field must be a valid date',
+            'startDate.date' => 'The date field must be a valid date',
+            'endDate.date' => 'The date field must be a valid date',
         ];
     }
 
@@ -52,7 +56,8 @@ class ProductRequest extends FormRequest
             'success' => false,
             'status_code' => 422,
             'message' => $validator->errors(),
-            'data'    => []
+            'data' => []
         ], 422));
     }
+
 }

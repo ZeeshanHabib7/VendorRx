@@ -56,7 +56,7 @@ class BrandController extends Controller
         try {
             $brand = Brand::findOrFail($id);
             $brand->delete();
-            return successResponse('Brand deleted successfully.', null, false, 204);
+            return successResponse('Brand deleted successfully.', [], false, 204);
         } catch (Exception $e) {
             return errorResponse('Failed to delete brand.', 500);
         }

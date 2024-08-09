@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ForgetPasswordRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\UserRegisterRequest_SA;
 use App\Http\Requests\UserLoginRequest_SA;
+use App\Mail\ForgetPasswordMail;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Resources\UserResource_SA;
@@ -11,6 +14,8 @@ use App\Http\Resources\UserResource;
 
 
 use Auth;
+use Mail;
+use URL;
 
 class LoginRegisterControllers extends Controller
 {
@@ -54,4 +59,67 @@ class LoginRegisterControllers extends Controller
         return Auth::guard('api')->attempt($request->only('email', 'password'));
     }
 
+    public function forgetPassword()
+    {
+
+        return view("forget-password");
+    }
+
+    public function sendEmail(ForgetPasswordRequest $request)
+    {
+        try {
+
+            $user = User::where('email', $request->email)->firstOrFail();
+
+            if (!is_null($user)) {
+                $domain = URL::to('/');
+                $url = $domain . '/users/reset-password/' . $user->id;
+                $data = [
+                    "url" => $url,
+                    "email" => $user->email,
+                    "title" => "Reset Password Link",
+                    "body" => "Please click on the below button to reset your password",
+                ];
+
+                Mail::to($request->email)->send(new ForgetPasswordMail($data));
+
+                return successResponse("Mail sent successfully. Please check your Inbox");
+            }
+
+        } catch (\Exception $e) {
+            return errorResponse($e->getMessage());
+        }
+    }
+
+    public function resetPasswordPageLoad($id)
+    {
+        try {
+
+            $user = User::where('id', $id)->firstOrFail();
+            if (!is_null($user))
+                return view("reset-password")->with('email', $user->email);
+
+        } catch (\Exception $e) {
+            return errorResponse($e->getMessage());
+        }
+
+    }
+
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        try {
+
+            $user = User::where('email', $request->email)->firstOrFail();
+
+            $user->password = $request->password;
+            $user->save();
+
+            return successResponse("Password Changed successfully");
+
+        } catch (\Exception $e) {
+            dd($e);
+            return errorResponse($e->getMessage());
+
+        }
+    }
 }

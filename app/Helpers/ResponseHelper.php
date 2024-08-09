@@ -4,26 +4,26 @@
 
 namespace App\Helpers;
 
-use App\Http\Resources\ProductResource_SA;
+use App\Http\Resources\ProductResource;
 
 class ResponseHelper
 {
 
-    public static function sendResponse($sucess, $code, $msg, $products = [], $paginate = false, $pageSize = 5, $pageNo = 1)
+    public static function sendResponse($sucess, $code, $msg, $data = [], $paginate = false, $pageSize = 5, $pageNo = 1)
     {
 
         $response = [
             'success' => $sucess,
             'status_code' => $code,
             'message' => [$msg],
-            'data' => ProductResource_SA::collection($products),
+            'data' => $data,
 
 
         ];
 
         if ($paginate) {
-            $products = self::paginate($products, $pageNo, $pageSize);
-            $response['data'] = $products;
+            $data = self::paginate($data, $pageNo, $pageSize);
+            $response['data'] = $data;
         }
 
         return $response;
@@ -37,7 +37,7 @@ class ResponseHelper
             // Initialize pagination array with list of items
             //dd($data);
             $paginationArray = [
-                'list' => ProductResource_SA::collection($data->items()),
+                'list' => $data,
                 'pagination' => []
             ];
 

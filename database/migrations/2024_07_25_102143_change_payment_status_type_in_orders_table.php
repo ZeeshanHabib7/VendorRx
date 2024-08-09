@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->softDeletes();
+        Schema::table('orders', function (Blueprint $table) {
+            $table->string('payment_status')->nullable()->default(null)->change();
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->dropSoftDeletes();
+        Schema::table('orders', function (Blueprint $table) {
+            $table->enum('payment_status', ["paid", "unpaid"])->default('unpaid')->change();
         });
     }
 };

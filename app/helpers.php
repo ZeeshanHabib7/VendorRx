@@ -1,12 +1,16 @@
 <?php
 
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Stripe\Exception\ApiErrorException;
 
 if (!function_exists('errorResponse')) {
     /**
@@ -62,7 +66,7 @@ if (!function_exists('getAuthenticatedUser')) {
 
     function getAuthenticatedUser()
     {
-       return auth('api')->user();
+        return auth('api')->user();
     }
 }
 
@@ -121,18 +125,72 @@ if (!function_exists('handleException')) {
 
         if ($e instanceof TokenInvalidException) {
             return errorResponse('Token is Invalid', 401);
-        } 
-        
+        }
+
         if ($e instanceof TokenExpiredException) {
             return errorResponse('Token is Expired', 401);
-        } 
-        
-        if($e instanceof JWTException) {
-            return errorResponse( 'Authorization Token not found', 401);
+        }
+
+        if ($e instanceof JWTException) {
+            return errorResponse('Authorization Token not found', 401);
+        }
+
+        if($e instanceof ApiErrorException ) {
+            return errorResponse( $e->getMessage(), 402);
         }
 
         // For other exceptions, return a generic error response
         return errorResponse('An unexpected error occurred.', $e->getCode());
+    }
+}
+
+if (!function_exists('encryptData')) {
+    function encryptData($data)
+    {
+        return Crypt::encrypt($data);
+    }
+}
+
+
+if (!function_exists('encrypt_payload')) {
+
+    function encrypt_payload(Request $request)
+    {
+        try {
+
+            $responseData = $request->getContent();
+            $encryptedResponse = Crypt::encrypt($responseData);
+            return successResponse("Encrypted Successfully", $encryptedResponse);
+        } catch (EncryptException $e) {
+            return errorResponse($e->getMessage());
+
+        }
+    }
+}
+
+if (!function_exists('decrypt_payload')) {
+    function decrypt_payload(Request $request)
+    {
+        try {
+
+            $decryptedPayload = Crypt::decrypt($request->encryptedData);
+            $decodedPayload = json_decode($decryptedPayload, true);
+            return successResponse("Decrypted Successfully", $decodedPayload);
+
+        } catch (DecryptException $e) {
+            return errorResponse($e->getMessage());
+
+        }
+
+    }
+}
+
+
+if (!function_exists('getCurrentUserId')) {
+
+    function getCurrentUserId()
+    {
+        return auth()->user()->id;
     }
 }
 
