@@ -23,7 +23,7 @@ class AddToCartRequest extends FormRequest
      */
     public function rules(): array
     {
-        // dd($this->request);
+      
         return [
             "products" => "required | array",
             'products.*.product_id' => 'required|integer|exists:products,id',

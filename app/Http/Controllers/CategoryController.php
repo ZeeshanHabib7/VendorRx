@@ -1,15 +1,11 @@
 <?php
-// app/Http/Controllers/CategoryController_HR.php
-// app/Http/Controllers/CategoryController_HR.php
 
 namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
-use App\Http\Helpers\ResponseHelper;
 use App\Http\Resources\CategoryResource;
-use Illuminate\Http\Request;
 use Exception;
 
 class CategoryController extends Controller
@@ -17,7 +13,7 @@ class CategoryController extends Controller
     public function index()
     {
         try {
-            $categories = Category::latest()->get();
+            $categories = Category::whereNull('parent_id')->with('subCategories')->latest()->get();
             return successResponse('Categories retrieved successfully.', CategoryResource::collection($categories));
         } catch (Exception $e) {
             return errorResponse('Failed to retrieve categories.', 500);
@@ -28,7 +24,7 @@ class CategoryController extends Controller
     {
         try {
             $category = Category::create($request->validated());
-            return successResponse('Category created successfully.', new CategoryResource($category), 201);
+            return successResponse('Category created successfully.', new CategoryResource($category), false, 201);
         } catch (Exception $e) {
             return errorResponse('Failed to create category.', 500);
         }
@@ -37,8 +33,8 @@ class CategoryController extends Controller
     public function show($id)
     {
         try {
-            $category = Category::findOrFail($id);
-            return successResponse("Category Fetched Successfully", new CategoryResource($category));
+            $category = Category::with('subCategories')->findOrFail($id);
+            return successResponse('Category retrieved successfully.', new CategoryResource($category));
         } catch (Exception $e) {
             return errorResponse('Category not found.', 404);
         }
@@ -60,7 +56,7 @@ class CategoryController extends Controller
         try {
             $category = Category::findOrFail($id);
             $category->delete();
-            return successResponse('Category deleted successfully.', 204);
+            return successResponse('Category deleted successfully.', [], false, 204);
         } catch (Exception $e) {
             return errorResponse('Failed to delete category.', 500);
         }

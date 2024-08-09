@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 
 
 use App\Http\Requests\AddToCartRequest;
@@ -14,6 +15,9 @@ use App\Models\Payment;
 use App\Http\Interfaces\PaymentServiceInterface;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\Auth; // Add this for Auth
+use Illuminate\Support\Collection;   // Add this for Collection
+use App\Jobs\SendOrderConfirmationEmail; // Add this for SendOrderConfirmationEmail
 
 class AddToCartController extends Controller
 {
@@ -50,36 +54,41 @@ class AddToCartController extends Controller
             $order->user_id = $user->id;
             $order->address = $request['billing_address'];
             $order->order_discount = $request['order_discount'];
-
             $order->save();
 
             $products = $request->input("products");
 
+            // Initialize total values
+            $totalPrice = 0;
+            $totalDiscount = 0;
 
-            //Now for each product in the request payload we will add that product in our order details table
+            $orderDetailsCollection = new Collection(); // Initialize a collection for order details
+
+            // Process each product
             foreach ($products as $product) {
                 $order->total_quantity += $product['quantity'];
-
                 //selecting only required data of the product
                 $retrievedProduct = Product::select('id', 'name', 'price', 'discount', 'promotion')->find($product['product_id']);
 
-                // if any product has a promotion than order_discount not applicable
-                if ($retrievedProduct->promotion) {
+                // If any product has a promotion, set order_discount to 0
+                if ($retrievedProduct && $retrievedProduct->promotion) {
                     $order->order_discount = 0;
                 }
 
                 if ($retrievedProduct) {
-
                     //creating an Order_detail instance and initializing its fields
                     $orderDetails = OrderDetail::create([
+
                         "order_id" => $order->order_id,
                         "product_id" => $retrievedProduct->id,
                         "product_name" => $retrievedProduct->name,
                         "quantity" => $product['quantity'],
                         "net_unit_price" => $retrievedProduct->price,
                         "discount" => $retrievedProduct->discount,
-                        "total" => $product['quantity'] * $retrievedProduct->price - $product['quantity'] * $retrievedProduct->price * ($retrievedProduct->discount / 100),
+                        "total" => $totalPrice,
                     ]);
+
+                    $orderDetailsCollection->push($orderDetails); // Add order details to the collection
 
                     $order->total_price += $orderDetails->total;
                     $order->total_discount += $orderDetails->discount;
@@ -88,6 +97,7 @@ class AddToCartController extends Controller
             }
 
             $total = $order->total_price - $order->total_price * ($order->order_discount / 100);
+
 
             //Initializing the fields for our Order table
             $order->total_tax = $order->total_price * 0.17;
@@ -117,6 +127,12 @@ class AddToCartController extends Controller
             }
 
 
+            // Send order confirmation email
+            $user = Auth::user(); 
+            if (!$user || !$user instanceof User) {
+                throw new Exception("Authenticated user is not of type App\\Models\\User.");
+            }
+            dispatch(new SendOrderConfirmationEmail($orderDetailsCollection, $user));
             // Commit transaction
             DB::commit();
 
@@ -128,7 +144,6 @@ class AddToCartController extends Controller
             DB::rollBack();
             return errorResponse($e->getMessage());
         }
-
     }
 
     private function generateReferenceNumber()
@@ -138,7 +153,8 @@ class AddToCartController extends Controller
 
         return $currentDate . 'DIP' . $currentTime;
     }
-    // These two functions are for verifying the encrypted and decrypted
+
+ // These two functions are for verifying the encrypted and decrypted
 
 
 
@@ -212,6 +228,4 @@ class AddToCartController extends Controller
             return handleException($e);
         }
     }
-
 }
-

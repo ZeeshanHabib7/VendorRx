@@ -73,4 +73,3 @@ Route::middleware(['check.auth',])->group(function () {
 
     
 });
-?>
