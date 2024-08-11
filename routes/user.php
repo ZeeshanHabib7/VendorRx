@@ -8,14 +8,13 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PermissionController_FH;
 use App\Http\Controllers\RoleController_FH;
 
-
 //-------- Auth Routes --------
 Route::post('login', [AuthController::class,'login']);
 Route::post('signup', [AuthController::class,'signUp']);
 
+
 // Routes for authorized user
 Route::middleware(['check.auth',])->group(function () {
-    Route::post('me', [AuthController::class,'me']); //user route
     Route::post('logout', [AuthController::class,'logout']);
  
                         // Routes only accessed by super admin
@@ -23,13 +22,13 @@ Route::middleware(['check.auth',])->group(function () {
 
         //--------  Permission Crud routes -------- 
             Route::post('/permission', [PermissionController_FH::class, 'create']);
-            Route::get('/permission', [PermissionController_FH::class, 'index']);
+            Route::get('/permissions', [PermissionController_FH::class, 'index']); 
             Route::patch('/permission/{id}', [PermissionController_FH::class, 'edit']);
             Route::delete('/permission/{id}', [PermissionController_FH::class, 'destroy']);
 
         //--------  Role Crud route -------- 
             Route::post('/role', [RoleController_FH::class, 'create']);
-            Route::get('/role', [RoleController_FH::class, 'index']);
+            Route::get('/roles', [RoleController_FH::class, 'index']); 
             Route::patch('/role/{id}', [RoleController_FH::class, 'edit']);
             Route::delete('/role/{id}', [RoleController_FH::class, 'destroy']);
 
