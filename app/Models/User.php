@@ -14,10 +14,10 @@ use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Models\Role;
 use Exception;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 class User extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes; //added softdeletes
 
     public function getJWTIdentifier()
     {
