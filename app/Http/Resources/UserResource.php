@@ -27,7 +27,7 @@ class UserResource extends JsonResource
 
             // Check if roles exist and include them in the response    
            if ($this->roles->isNotEmpty()) {
-                 $user['roles'] = $this->roles->pluck('name');
+                 $user['role'] = $this->roles->pluck('name'); //corrected roles to role
             }
 
             return $user;

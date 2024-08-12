@@ -13,8 +13,7 @@ use App\Http\Interfaces\PaymentServiceInterface;
 class ProductController extends Controller implements CrudInterface_FH
 {
     private $isPaginate = false;
-    private $defaultPageSize = 10;
-    private $defaultPageNum = 1;
+    private $noOfRecordPerPage = 10;
     protected $paymentService;
 
     // Injected Service 
@@ -34,10 +33,9 @@ class ProductController extends Controller implements CrudInterface_FH
 
                 // check for pagination
                 if ($request->input('paginate')) {
-                    $pageSize = $request->input('pageSize', $this->defaultPageSize);
-                    $pageNum = $request->input('pageNum', $this->defaultPageNum);
+                    $noOfRecordPerPage = $request->input('perPage', $this->noOfRecordPerPage); // Default to 10 records per page if not specified
                     $this->isPaginate = true;
-                    $products = $filteredProducts->paginate($pageSize, ['*'], 'page', $pageNum);
+                    $products = $filteredProducts->paginate($noOfRecordPerPage);
                 }
                 // else fetch all products without pagination
                 else {

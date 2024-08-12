@@ -34,7 +34,7 @@ class CouponController extends Controller implements CrudInterface_FH
                 // check for pagination and get coupons
                 $coupons = $this->checkPaginationAndGetCoupons($request, $filteredCoupon);
             }
-            // else fetch all products
+            // else fetch all coupons
             else {
                 // check for pagination
                 $coupons = $this->checkPaginationAndGetCoupons($request);
@@ -187,11 +187,11 @@ class CouponController extends Controller implements CrudInterface_FH
             // Find the coupon
             $coupon = Coupon::with("CouponCodes")->findOrFail($id);
 
-            // Get the coupon IDs from the coupon codes table
-            $couponIds = $coupon->couponCodes->pluck('id');
+            // Get the coupon code ids from the coupon codes table
+            $couponCodeIds = $coupon->couponCodes->pluck('id');
 
-            // Check if any of these coupon IDs have been used
-            if(CouponUsage::whereIn('coupon_code_id', $couponIds)->exists()) {
+            // Check if any of these coupon code Ids have been used
+            if(CouponUsage::whereIn('coupon_code_id', $couponCodeIds)->exists()) {
                 return errorResponse("Cannot update the coupon because it has already been used.", 400);
             }
 
@@ -378,7 +378,7 @@ class CouponController extends Controller implements CrudInterface_FH
 // -- sanitizing coupon name to create the coupon code --
      private function sanitizeCode($couponName)
      {
-         // Remove special characters, replace spaces with hyphens, and convert to uppercase
+         // Remove special characters, replace spaces with hyphens
          return preg_replace('/[^A-Za-z0-9]+/', '-', $couponName);
      }
  

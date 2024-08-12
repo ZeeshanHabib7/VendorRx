@@ -25,7 +25,7 @@ class RoleRequest_FH extends FormRequest
     {
         // Rule for create method
         if ($this->isMethod('post')) {
-            return ['name' => 'required|unique:role,name,'];
+            return ['name' => 'required|unique:roles,name,']; //roles mistake
         }
          // Rule for update method
         elseif ($this->isMethod('patch') || $this->isMethod('put')) {

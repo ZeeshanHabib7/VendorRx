@@ -28,7 +28,7 @@ class CouponRequest extends FormRequest
             return [
                 'name' => 'string',
                 'usage_limit_min' => 'numeric|min:1',
-                'usage_limit_min' => 'numeric',
+                'usage_limit_max' => 'numeric', // corrected min to max
                 'product_id' => 'nullable',
                 'status' => 'string|in:active,deactive',
                 'stripe_price_id' => 'nullable|string',
