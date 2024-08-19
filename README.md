@@ -1,98 +1,30 @@
-# Laravel Project Setup Guide
+Contributing Guidelines
+Thank you for your interest in contributing to our project! To ensure a smooth and effective collaboration, please follow these guidelines:
 
-Welcome to the demo-internee-app-git repository! This guide will help you set up the project on your local machine for development and contribution.
+How to Contribute
+Do Not Merge Code into main:
+Please do not merge your code directly into the main branch. The repository owner will handle the merging of pull requests (PRs). This helps maintain the stability of the main branch.
 
-## Prerequisites
+Create a New Branch for Each Task:
+For any collaboration or changes, create a new branch from main. Name your branch according to the type of work you are doing:
 
-Before you begin, ensure you have the following installed on your local machine:
+For new features: feature/your-task-title
+For bug fixes: fix/your-fix-title
+Example: git checkout -b feature/your-task-title Pull Latest Changes Before Pushing: Before pushing any changes to your branch, make sure to pull the latest changes from the main branch to ensure your branch is up to date:
 
-- **PHP >= 8.0**
-- **Composer**
-- **Node.js**
-- **npm or yarn**
-- **MySQL or any other supported database**
+git checkout main git pull origin main git checkout your-branch git merge main Write Clear Comments: Provide clear and descriptive comments in your code. This improves the readability and maintainability of the codebase, making it easier for others to understand your contributions.
 
-## Getting Started
+Provide Detailed Pull Request Descriptions: When creating a Pull Request (PR), include a detailed description of your work. Clearly outline what is included in the PR and any relevant details. For example:
 
-Follow these steps to set up the project:
+What's in this PR:
 
-### 1. Clone the Repository
+Login page
+Details:
 
+Added a login page for users and admins
+The form accepts user email and password with validation
+Be Patient with PR Reviews:
 
-git clone https://github.com/ZeeshanHabib7/demo-internee-app-git.git
-cd yourproject
-
-2. Install Dependencies
-Install PHP Dependencies
-
-
-composer install
-Install Node.js Dependencies
-
-
-npm install
-# or
-yarn install
-
-3. Set Up Environment Variables
-Copy the .env.example file to .env and configure your environment variables.
-
-
-cp .env.example .env
-Update the following variables in the .env file according to your local setup:
-
-# env
-APP_NAME=Laravel
-APP_ENV=local
-APP_KEY=base64:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-APP_DEBUG=true
-APP_URL=http://localhost
-
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=your_database_name
-DB_USERNAME=your_database_user
-DB_PASSWORD=your_database_password
-
-# Other environment variables...
-
-4. Generate Application Key
-php artisan key:generate
-
-5. Run Migrations and Seed Database
-php artisan migrate --seed
-
-6. Run the Development Server
-php artisan serve
-
-7. Compile Assets
-To compile the assets, run:
-
-npm run dev
-
-# or
-yarn dev
-Additional Commands
-Running Tests
-To run the tests, use:
-
-php artisan test
-
-# Contribution Guidelines
-We appreciate your contributions! Please follow these guidelines:
-
-Fork the repository.
-Create a new branch (git checkout -b feature/your-feature-name).
-Commit your changes (git commit -am 'Add new feature').
-Push to the branch (git push origin feature/your-feature-name).
-Create a new Pull Request.
-For more details, check out our CONTRIBUTING.md file.
-
-License
-This project is licensed under the MIT License.
-
-Contact
-If you have any questions or need further assistance, feel free to open an issue or contact Your Name.
+Your PR will be reviewed and merged by the repository owner. Please allow 7-10 days for the review process. We appreciate your patience and understanding.
 
 Happy coding!
