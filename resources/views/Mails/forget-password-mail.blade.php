@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{$mailData['title']}}</title>
+    <title>{{ $mailData['title'] }}</title>
     <link href="{{ asset('css/mail.css') }}" rel="stylesheet">
 </head>
 <style>
@@ -52,11 +52,10 @@
     <div class="container">
         <img src="{{ asset('logo.png') }}" alt="logo" height="100">
         <h1>Forget Passoword</h1>
-        <p>{{$mailData['body']}}</p>
-        <a href="{{$mailData['url']}}"><button>Reset Passoword</button></a>
+        <p>{{ $mailData['body'] }}</p>
+        <a href="{{ $mailData['url'] }}"><button>Reset Passoword</button></a>
 
     </div>
 </body>
-{{dd("test")}}
 
 </html>

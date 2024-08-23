@@ -3,32 +3,34 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CouponController;
-use App\Http\Controllers\UserController_FH;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\PermissionController_FH;
 use App\Http\Controllers\RoleController_FH;
+use App\Http\Controllers\UserController_FH;
+use App\Http\Controllers\PermissionController_FH;
+use App\Http\Controllers\LoginRegisterControllers;
 
 //-------- Auth Routes --------
 Route::post('login', [AuthController::class,'login']);
 Route::post('signup', [AuthController::class,'signUp']);
 
+Route::post('forgot-password', [LoginRegisterControllers::class, 'sendEmail'])->name('sendEmail');
 
 // Routes for authorized user
 Route::middleware(['check.auth',])->group(function () {
     Route::post('logout', [AuthController::class,'logout']);
- 
+
                         // Routes only accessed by super admin
     Route::group(['middleware' => ['role:superAdmin']], function () {
 
-        //--------  Permission Crud routes -------- 
+        //--------  Permission Crud routes --------
             Route::post('/permission', [PermissionController_FH::class, 'create']);
-            Route::get('/permissions', [PermissionController_FH::class, 'index']); 
+            Route::get('/permissions', [PermissionController_FH::class, 'index']);
             Route::patch('/permission/{id}', [PermissionController_FH::class, 'edit']);
             Route::delete('/permission/{id}', [PermissionController_FH::class, 'destroy']);
 
-        //--------  Role Crud route -------- 
+        //--------  Role Crud route --------
             Route::post('/role', [RoleController_FH::class, 'create']);
-            Route::get('/roles', [RoleController_FH::class, 'index']); 
+            Route::get('/roles', [RoleController_FH::class, 'index']);
             Route::patch('/role/{id}', [RoleController_FH::class, 'edit']);
             Route::delete('/role/{id}', [RoleController_FH::class, 'destroy']);
 
@@ -56,7 +58,7 @@ Route::middleware(['check.auth',])->group(function () {
         Route::delete('product/{id}', [ProductController::class, 'destroy']);
 
         //-------- Coupon CRUD Routes --------
-        Route::get('coupons',[CouponController::class,'getCoupons']); 
+        Route::get('coupons',[CouponController::class,'getCoupons']);
         Route::get('coupon/{id}', [CouponController::class, 'show']);
         Route::post('coupon', [CouponController::class, 'create']);
         Route::put('coupon/{id}', [CouponController::class, 'edit']);
@@ -66,9 +68,9 @@ Route::middleware(['check.auth',])->group(function () {
 
                         // Routes accessed by all roles
     Route::group(['middleware' => ['role:superAdmin|admin|user|staff']], function () {
-        // get filtered or all products  
-         Route::get('products',[ProductController::class,'getProducts']); 
+        // get filtered or all products
+         Route::get('products',[ProductController::class,'getProducts']);
     });
 
-    
+
 });
