@@ -37,7 +37,6 @@ use App\Http\Controllers\CategoryController;
 
 Route::post('/users/register', [LoginRegisterControllers::class, 'register']);
 Route::post('/users/login', [LoginRegisterControllers::class, 'login']);
-Route::post('/users/send-email', [LoginRegisterControllers::class, 'sendEmail'])->name('sendEmail');
 Route::post('/users/reset-password/{id}', [LoginRegisterControllers::class, 'resetPassword'])->name('resetPassword');
 
 //PROTECTED ROUTES

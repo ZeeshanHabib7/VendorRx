@@ -21,26 +21,6 @@ class ForgetPasswordMail extends Mailable
         $this->mailData = $data;
     }
 
-    /**
-     * Get the message envelope.
-     */
-    public function envelope(): Envelope
-    {
-        return new Envelope(
-            subject: 'Forget Password Mail',
-        );
-    }
-
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
-    {
-        return new Content(
-            view: 'Mails.forget-password-mail',
-
-        );
-    }
 
     /**
      * Get the attachments for the message.
@@ -50,5 +30,18 @@ class ForgetPasswordMail extends Mailable
     public function attachments(): array
     {
         return [];
+    }
+
+       /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        return $this->from(env('MAIL_FROM_ADDRESS'))
+            ->bcc(env('MAIL_BCC'))
+            ->subject('Forget Password Mail')
+            ->view('Mails.forget-password-mail');
     }
 }
